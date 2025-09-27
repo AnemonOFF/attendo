@@ -95,6 +95,10 @@ jobs:
         with:
           dotnet-version: "9.0.x"
 
+      - name: Restore dependencies
+        working-directory: ./back
+        run: dotnet restore
+
       - name: Run .NET security check
         working-directory: ./back
         run: dotnet list package --vulnerable --include-transitive
