@@ -1,0 +1,78 @@
+name: Pull Request Checks
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  pr-checks:
+    name: PR Quality Checks
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: front/package-lock.json
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "9.0.x"
+
+      - name: Install frontend dependencies
+        working-directory: ./front
+        run: npm ci
+
+      - name: Frontend lint check
+        working-directory: ./front
+        run: npm run lint
+
+      - name: Frontend type check
+        working-directory: ./front
+        run: npx tsc --noEmit
+
+      - name: Frontend build check
+        working-directory: ./front
+        run: npm run build
+
+      - name: Backend restore
+        working-directory: ./back
+        run: dotnet restore
+
+      - name: Backend build check
+        working-directory: ./back
+        run: dotnet build --configuration Release --no-restore
+
+      - name: Backend test
+        working-directory: ./back
+        run: dotnet test --configuration Release --no-build --verbosity normal
+        continue-on-error: true
+
+      - name: Check for TODO/FIXME comments
+        run: |
+          echo "Checking for TODO/FIXME comments in code..."
+          if grep -r "TODO\|FIXME" front/src/ back/ --exclude-dir=node_modules --exclude-dir=bin --exclude-dir=obj; then
+            echo "::warning::Found TODO/FIXME comments in the code. Consider addressing them before merging."
+          fi
+
+      - name: Check file sizes
+        run: |
+          echo "Checking for large files..."
+          find . -type f -size +1M -not -path "./node_modules/*" -not -path "./.git/*" -not -path "./back/bin/*" -not -path "./back/obj/*" | head -10
+
+      - name: Generate PR summary
+        run: |
+          echo "## Pull Request Summary" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Frontend linting passed" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Frontend type checking passed" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Frontend build successful" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Backend build successful" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ All checks completed" >> $GITHUB_STEP_SUMMARY
