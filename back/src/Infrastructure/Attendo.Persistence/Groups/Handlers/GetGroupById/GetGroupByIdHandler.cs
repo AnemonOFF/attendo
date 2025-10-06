@@ -5,6 +5,7 @@ using Attendo.Application.DTOs;
 using Attendo.Application.Groups.Queries;
 using Attendo.Application.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Attendo.Application.DTOs.Groups;
 
 namespace Attendo.Persistence.Groups.Handlers
 {

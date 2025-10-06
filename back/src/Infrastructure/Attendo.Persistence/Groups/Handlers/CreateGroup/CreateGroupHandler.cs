@@ -5,6 +5,7 @@ using Attendo.Application.DTOs;
 using Attendo.Application.Groups.Commands;
 using Attendo.Application.Interfaces;
 using Attendo.Domain.Entities;
+using Attendo.Application.DTOs.Groups;
 
 namespace Attendo.Persistence.Groups.Handlers
 {

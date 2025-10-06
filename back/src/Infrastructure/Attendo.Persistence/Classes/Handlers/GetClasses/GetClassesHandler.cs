@@ -1,20 +1,31 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using Attendo.Application.DTOs;
 using Attendo.Application.Classes.Queries;
+using Attendo.Application.DTOs.Classes;
 using Attendo.Application.Interfaces;
 
-namespace Attendo.Persistence.Classes.Handlers
+namespace Attendo.Persistence.Classes.Handlers.GetClasses
 {
-    public class GetClassesHandler : IRequestHandler<GetClassesQuery, IReadOnlyList<ClassDto>>
+    public class GetClassesHandler : IRequestHandler<GetClassesQuery, ClassesListResponse>
     {
         private readonly IAppDbContext _db;
         public GetClassesHandler(IAppDbContext db) => _db = db;
 
-        public async Task<IReadOnlyList<ClassDto>> Handle(GetClassesQuery request, CancellationToken ct)
+        public async Task<ClassesListResponse> Handle(GetClassesQuery request, CancellationToken ct)
         {
-            var list = await _db.Classes.AsNoTracking().ToListAsync(ct);
-            return list.Select(e => new ClassDto { Id = e.Id, Date = e.Date, Type = e.Type, GroupId = e.GroupId }).ToList();
+            var items = await _db.Classes
+                .AsNoTracking()
+                .OrderBy(c => c.Start)
+                .Select(c => new ClassResponse
+                {
+                    Id = c.Id,
+                    Start = c.Start,
+                    End = c.End,
+                    GroupId = c.GroupId
+                })
+                .ToListAsync(ct);
+
+            return new ClassesListResponse { Items = items };
         }
     }
 }

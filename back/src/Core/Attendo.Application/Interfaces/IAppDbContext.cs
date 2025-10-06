@@ -9,6 +9,7 @@ public interface IAppDbContext
     DbSet<Student> Students { get; }
     DbSet<Class> Classes { get; }
     DbSet<Attendance> Attendances { get; }
+    DbSet<User> Users { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken);
 }

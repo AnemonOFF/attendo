@@ -5,6 +5,7 @@ using Attendo.Application.Classes.Commands.CreateClass;
 using Attendo.Application.Classes.Commands.DeleteClass;
 using Attendo.Application.Classes.Commands.UpdateClass;
 using Attendo.Application.Classes.Queries;
+using Attendo.Application.DTOs.Classes;
 
 namespace Attendo.WebAPI.Controllers
 {

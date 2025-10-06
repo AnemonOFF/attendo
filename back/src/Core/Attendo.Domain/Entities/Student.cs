@@ -8,5 +8,5 @@ public class Student
     public int GroupId { get; set; }
     public Group Group { get; set; } = null!;
 
-    public List<Attendance> Attendances { get; set; } = new();
+    public List<Attendance> Attendances { get; set; } = new List<Attendance>();
 }

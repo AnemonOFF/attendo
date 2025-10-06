@@ -1,12 +1,12 @@
 using MediatR;
-using Attendo.Application.DTOs;
+using Attendo.Application.DTOs.Classes;
 
 namespace Attendo.Application.Classes.Commands.CreateClass
 {
     public class CreateClassCommand : IRequest<ClassDto>
     {
-        public DateTime Date { get; set; }
-        public string Type { get; set; } = string.Empty;
+        public DateTimeOffset Start { get; set; }
+        public DateTimeOffset? End { get; set; }
         public int GroupId { get; set; }
     }
 }

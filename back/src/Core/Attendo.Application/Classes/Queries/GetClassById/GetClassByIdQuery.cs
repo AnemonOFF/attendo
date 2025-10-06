@@ -1,5 +1,5 @@
 using MediatR;
-using Attendo.Application.DTOs;
+using Attendo.Application.DTOs.Classes;
 
 namespace Attendo.Application.Classes.Queries
 {

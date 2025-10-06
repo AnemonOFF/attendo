@@ -1,27 +1,39 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using Attendo.Application.DTOs;
 using Attendo.Application.Classes.Commands.UpdateClass;
+using Attendo.Application.DTOs.Classes;
 using Attendo.Application.Interfaces;
 
-namespace Attendo.Persistence.Classes.Handlers
+namespace Attendo.Persistence.Classes.Handlers.UpdateClass
 {
-    public class UpdateClassHandler : IRequestHandler<UpdateClassCommand, ClassDto>
+    public class UpdateClassHandler : IRequestHandler<UpdateClassCommand, ClassDto?>
     {
         private readonly IAppDbContext _db;
         public UpdateClassHandler(IAppDbContext db) => _db = db;
 
-        public async Task<ClassDto> Handle(UpdateClassCommand request, CancellationToken ct)
+        public async Task<ClassDto?> Handle(UpdateClassCommand request, CancellationToken ct)
         {
-            var entity = await _db.Classes.FirstOrDefaultAsync(x => x.Id == request.Id, ct)
-                         ?? throw new KeyNotFoundException($"Event {request.Id} not found");
+            var entity = await _db.Classes.FirstOrDefaultAsync(c => c.Id == request.Id, ct);
+            if (entity is null)
+                return null;
 
-            entity.Date = request.Date;
-            entity.Type = request.Type;
+            var groupExists = await _db.Groups.AnyAsync(g => g.Id == request.GroupId, ct);
+            if (!groupExists)
+                throw new KeyNotFoundException($"Group {request.GroupId} not found");
+
+            entity.Start   = request.Start;
+            entity.End     = request.End;
             entity.GroupId = request.GroupId;
+
             await _db.SaveChangesAsync(ct);
 
-            return new ClassDto { Id = entity.Id, Date = entity.Date, Type = entity.Type, GroupId = entity.GroupId };
+            return new ClassDto
+            {
+                Id      = entity.Id,
+                Start   = entity.Start,
+                End     = entity.End,
+                GroupId = entity.GroupId
+            };
         }
     }
 }

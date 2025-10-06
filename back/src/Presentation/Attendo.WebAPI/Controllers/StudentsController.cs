@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using MediatR;
-using Attendo.Application.DTOs;
+using Attendo.Application.DTOs.Students;
 using Attendo.Application.Students.Commands;
 using Attendo.Application.Students.Queries;
 
@@ -13,11 +13,11 @@ namespace Attendo.WebAPI.Controllers
         private readonly IMediator _mediator;
         public StudentsController(IMediator mediator) => _mediator = mediator;
 
-        [HttpPost]
-        public async Task<ActionResult<StudentDto>> Create([FromBody] CreateStudentCommand cmd)
+        [HttpGet]
+        public async Task<ActionResult<StudentsListResponse>> GetAll()
         {
-            var result = await _mediator.Send(cmd);
-            return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
+            var result = await _mediator.Send(new GetStudentsQuery());
+            return Ok(result);
         }
 
         [HttpGet("{id:int}")]
@@ -27,15 +27,15 @@ namespace Attendo.WebAPI.Controllers
             return result is null ? NotFound() : Ok(result);
         }
 
-        [HttpGet]
-        public async Task<ActionResult<IReadOnlyList<StudentDto>>> GetAll()
+        [HttpPost]
+        public async Task<ActionResult<StudentDto>> Create(CreateStudentCommand cmd)
         {
-            var result = await _mediator.Send(new GetStudentsQuery());
-            return Ok(result);
+            var result = await _mediator.Send(cmd);
+            return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
         }
 
         [HttpPut("{id:int}")]
-        public async Task<ActionResult<StudentDto>> Update(int id, [FromBody] UpdateStudentCommand cmd)
+        public async Task<ActionResult<StudentDto>> Update(int id, UpdateStudentCommand cmd)
         {
             cmd.Id = id;
             var result = await _mediator.Send(cmd);

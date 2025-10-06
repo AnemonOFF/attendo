@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Attendo.Application.DTOs;
 using Attendo.Application.Students.Queries;
 using Attendo.Application.Interfaces;
+using Attendo.Application.DTOs.Students;
 
 namespace Attendo.Persistence.Students.Handlers
 {

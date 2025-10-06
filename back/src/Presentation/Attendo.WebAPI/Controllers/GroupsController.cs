@@ -5,6 +5,7 @@ using MediatR;
 using Attendo.Application.DTOs;
 using Attendo.Application.Groups.Commands;
 using Attendo.Application.Groups.Queries;
+using Attendo.Application.DTOs.Groups;
 
 namespace Attendo.WebAPI.Controllers
 {

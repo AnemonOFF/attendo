@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Attendo.Application.DTOs;
 using Attendo.Application.Attendances.Queries.GetAttendances;
 using Attendo.Application.Interfaces;
+using Attendo.Application.DTOs.Attendances;
 
 namespace Attendo.Persistence.Attendances.Handlers
 {
@@ -14,7 +15,7 @@ namespace Attendo.Persistence.Attendances.Handlers
         public async Task<IReadOnlyList<AttendanceDto>> Handle(GetAttendancesQuery request, CancellationToken ct)
         {
             var list = await _db.Attendances.AsNoTracking().ToListAsync(ct);
-            return list.Select(a => new AttendanceDto { Id = a.Id, StudentId = a.StudentId, ClassId = a.EventId, Status = a.Status }).ToList();
+            return list.Select(a => new AttendanceDto { Id = a.Id, StudentId = a.StudentId, ClassId = a.ClassId, Status = a.Status }).ToList();
         }
     }
 }

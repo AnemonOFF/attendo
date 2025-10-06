@@ -1,4 +1,4 @@
-namespace Attendo.Application.DTOs
+namespace Attendo.Application.DTOs.Groups
 {
     public class GroupDto
     {

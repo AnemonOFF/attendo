@@ -1,7 +1,7 @@
 using MediatR;
-using Attendo.Application.DTOs;
+using Attendo.Application.DTOs.Classes;
 
 namespace Attendo.Application.Classes.Queries
 {
-    public class GetClassesQuery : IRequest<IReadOnlyList<ClassDto>> { }
+    public class GetClassesQuery : IRequest<ClassesListResponse> { }
 }

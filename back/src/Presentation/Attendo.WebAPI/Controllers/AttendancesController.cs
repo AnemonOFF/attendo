@@ -1,12 +1,12 @@
 using Microsoft.AspNetCore.Mvc;
 using MediatR;
-using Attendo.Application.DTOs;
 using Attendo.Application.Attendances.Commands.CreateAttendance;
 using Attendo.Application.Attendances.Commands.UpdateAttendance;
 using Attendo.Application.Attendances.Commands.DeleteAttendance;
 using Attendo.Application.Attendances.Queries.GetAttendanceById;
 using Attendo.Application.Attendances.Queries.GetAttendances;
 using Attendo.Application.Attendances.Queries.GetAttendancesByClass;
+using Attendo.Application.DTOs.Attendances;
 
 namespace Attendo.WebAPI.Controllers
 {
