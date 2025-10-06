@@ -6,7 +6,7 @@ using Attendo.Application.Attendances.Commands.UpdateAttendance;
 using Attendo.Application.Attendances.Commands.DeleteAttendance;
 using Attendo.Application.Attendances.Queries.GetAttendanceById;
 using Attendo.Application.Attendances.Queries.GetAttendances;
-using Attendo.Application.Attendances.Queries.GetAttendancesByEvent;
+using Attendo.Application.Attendances.Queries.GetAttendancesByClass;
 
 namespace Attendo.WebAPI.Controllers
 {
@@ -38,10 +38,10 @@ namespace Attendo.WebAPI.Controllers
             return Ok(result);
         }
 
-        [HttpGet("by-event/{eventId:int}")]
-        public async Task<ActionResult<IReadOnlyList<AttendanceDto>>> GetByEvent(int eventId)
+        [HttpGet("by-class/{classId:int}")]
+        public async Task<ActionResult<IReadOnlyList<AttendanceDto>>> GetByClass(int classId)
         {
-            var result = await _mediator.Send(new GetAttendancesByEventQuery { EventId = eventId });
+            var result = await _mediator.Send(new GetAttendancesByClassQuery { ClassId = classId });
             return Ok(result);
         }
 

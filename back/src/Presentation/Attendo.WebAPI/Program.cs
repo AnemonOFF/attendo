@@ -1,6 +1,6 @@
 using MediatR;
 using Attendo.Application;
-using Attendo.Persistence; 
+using Attendo.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
 

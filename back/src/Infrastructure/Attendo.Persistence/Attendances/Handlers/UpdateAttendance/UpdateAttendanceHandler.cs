@@ -19,7 +19,7 @@ namespace Attendo.Persistence.Attendances.Handlers
             entity.Status = request.Status;
             await _db.SaveChangesAsync(ct);
 
-            return new AttendanceDto { Id = entity.Id, StudentId = entity.StudentId, EventId = entity.EventId, Status = entity.Status };
+            return new AttendanceDto { Id = entity.Id, StudentId = entity.StudentId, ClassId = entity.EventId, Status = entity.Status };
         }
     }
 }

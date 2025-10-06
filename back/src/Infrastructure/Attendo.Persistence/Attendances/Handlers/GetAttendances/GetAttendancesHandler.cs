@@ -14,7 +14,7 @@ namespace Attendo.Persistence.Attendances.Handlers
         public async Task<IReadOnlyList<AttendanceDto>> Handle(GetAttendancesQuery request, CancellationToken ct)
         {
             var list = await _db.Attendances.AsNoTracking().ToListAsync(ct);
-            return list.Select(a => new AttendanceDto { Id = a.Id, StudentId = a.StudentId, EventId = a.EventId, Status = a.Status }).ToList();
+            return list.Select(a => new AttendanceDto { Id = a.Id, StudentId = a.StudentId, ClassId = a.EventId, Status = a.Status }).ToList();
         }
     }
 }

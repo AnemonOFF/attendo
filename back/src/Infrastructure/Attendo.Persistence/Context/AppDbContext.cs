@@ -10,7 +10,7 @@ namespace Attendo.Persistence
 
         public DbSet<Group> Groups => Set<Group>();
         public DbSet<Student> Students => Set<Student>();
-        public DbSet<Event> Events => Set<Event>();
+        public DbSet<Class> Classes => Set<Class>();
         public DbSet<Attendance> Attendances => Set<Attendance>();
     }
 }

@@ -1,9 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Core\Atendo.Application\Atendo.Application.csproj" />
-    <ProjectReference Include="..\..\Core\Atendo.Domain\Atendo.Domain.csproj" />
-    <ProjectReference Include="..\..\Shared\Atendo.Shared\Atendo.Shared.csproj" />
+    <ProjectReference Include="..\..\Core\Attendo.Application\Attendo.Application.csproj" />
+    <ProjectReference Include="..\..\Core\Attendo.Domain\Attendo.Domain.csproj" />
+    <ProjectReference Include="..\..\Shared\Attendo.Shared\Attendo.Shared.csproj" />
   </ItemGroup>
 
   <PropertyGroup>

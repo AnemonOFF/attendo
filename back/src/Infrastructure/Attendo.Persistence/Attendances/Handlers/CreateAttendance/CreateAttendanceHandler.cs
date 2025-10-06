@@ -15,7 +15,7 @@ namespace Attendo.Persistence.Attendances.Handlers
         public async Task<AttendanceDto> Handle(CreateAttendanceCommand request, CancellationToken ct)
         {
             var hasStudent = await _db.Students.AnyAsync(s => s.Id == request.StudentId, ct);
-            var hasEvent = await _db.Events.AnyAsync(e => e.Id == request.EventId, ct);
+            var hasEvent = await _db.Classes.AnyAsync(e => e.Id == request.EventId, ct);
             if (!hasStudent) throw new KeyNotFoundException($"Student {request.StudentId} not found");
             if (!hasEvent) throw new KeyNotFoundException($"Event {request.EventId} not found");
 
@@ -23,7 +23,7 @@ namespace Attendo.Persistence.Attendances.Handlers
             _db.Attendances.Add(entity);
             await _db.SaveChangesAsync(ct);
 
-            return new AttendanceDto { Id = entity.Id, StudentId = entity.StudentId, EventId = entity.EventId, Status = entity.Status };
+            return new AttendanceDto { Id = entity.Id, StudentId = entity.StudentId, ClassId = entity.EventId, Status = entity.Status };
         }
     }
 }

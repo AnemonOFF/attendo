@@ -14,7 +14,7 @@ namespace Attendo.Persistence.Attendances.Handlers
         public async Task<AttendanceDto?> Handle(GetAttendanceByIdQuery request, CancellationToken ct)
         {
             var a = await _db.Attendances.AsNoTracking().FirstOrDefaultAsync(x => x.Id == request.Id, ct);
-            return a is null ? null : new AttendanceDto { Id = a.Id, StudentId = a.StudentId, EventId = a.EventId, Status = a.Status };
+            return a is null ? null : new AttendanceDto { Id = a.Id, StudentId = a.StudentId, ClassId = a.EventId, Status = a.Status };
         }
     }
 }

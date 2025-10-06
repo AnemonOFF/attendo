@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Attendo.Domain\Attendo.Domain.csproj" />
+    <ProjectReference Include="..\..\Shared\Attendo.Shared\Attendo.Shared.csproj" />
   </ItemGroup>
 
   <ItemGroup>

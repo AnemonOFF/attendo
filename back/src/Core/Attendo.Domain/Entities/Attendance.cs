@@ -8,7 +8,7 @@ namespace Attendo.Domain.Entities
         public Student Student { get; set; } = null!;
 
         public int EventId { get; set; }
-        public Event Event { get; set; } = null!;
+        public Class Event { get; set; } = null!;
 
         public AttendanceStatus Status { get; set; }
     }
