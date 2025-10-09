@@ -1,27 +1,22 @@
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 using Attendo.Application.DTOs.Students;
 using Attendo.Application.Students.Commands;
 using Attendo.Application.Interfaces;
 using Attendo.Domain.Entities;
 
-namespace Attendo.Persistence.Students.Handlers.CreateStudent
+namespace Attendo.Persistence.Students.Handlers
 {
     public class CreateStudentHandler : IRequestHandler<CreateStudentCommand, StudentDto>
     {
         private readonly IAppDbContext _db;
+
         public CreateStudentHandler(IAppDbContext db) => _db = db;
 
         public async Task<StudentDto> Handle(CreateStudentCommand request, CancellationToken ct)
         {
-            var groupExists = await _db.Groups.AnyAsync(g => g.Id == request.GroupId, ct);
-            if (!groupExists)
-                throw new ArgumentException($"Group {request.GroupId} not found.", nameof(request.GroupId));
-
             var entity = new Student
             {
-                FullName = request.FullName,
-                GroupId  = request.GroupId
+                FullName = request.FullName
             };
 
             _db.Students.Add(entity);
@@ -29,9 +24,8 @@ namespace Attendo.Persistence.Students.Handlers.CreateStudent
 
             return new StudentDto
             {
-                Id       = entity.Id,
-                FullName = entity.FullName,
-                GroupId  = entity.GroupId
+                Id = entity.Id,
+                FullName = entity.FullName
             };
         }
     }

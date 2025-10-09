@@ -1,13 +1,14 @@
-using Attendo.Application.DTOs.Attendances;
+using Attendo.Application.DTOs.Groups;
 
-namespace Attendo.Application.DTOs.Classes;
-
-public class ClassResponse
+namespace Attendo.Application.DTOs.Classes
 {
-    public int Id { get; set; }
-    public DateTimeOffset Start { get; set; }
-    public DateTimeOffset? End { get; set; }
-    public int GroupId { get; set; }
+    public class ClassResponse
+    {
+        public int Id { get; set; }
+        public DateTimeOffset Start { get; set; }
+        public DateTimeOffset? End { get; set; }
 
-    public IList<AttendanceDto> Attendance { get; set; } = new List<AttendanceDto>();
+        public List<GroupDto> Groups { get; set; } = new();
+        public List<int> Attendance { get; set; } = new();
+    }
 }

@@ -1,5 +1,6 @@
 using MediatR;
 using Attendo.Application.DTOs.Classes;
+using Attendo.Application.DTOs.Groups;
 
 namespace Attendo.Application.Classes.Commands.CreateClass
 {
@@ -7,6 +8,7 @@ namespace Attendo.Application.Classes.Commands.CreateClass
     {
         public DateTimeOffset Start { get; set; }
         public DateTimeOffset? End { get; set; }
-        public int GroupId { get; set; }
+        public List<GroupDto> Groups { get; set; } = new();
+
     }
 }

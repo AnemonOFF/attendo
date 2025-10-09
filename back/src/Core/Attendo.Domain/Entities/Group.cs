@@ -6,5 +6,4 @@ public class Group
     public string Title { get; set; } = string.Empty;
 
     public List<Student> Students { get; set; } = new List<Student>();
-    public List<Class> Classes { get; set; } = new List<Class>();
 }

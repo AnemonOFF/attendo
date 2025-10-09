@@ -1,3 +1,4 @@
+
 namespace Attendo.Domain.Entities
 {
     public class Class
@@ -5,10 +6,8 @@ namespace Attendo.Domain.Entities
         public int Id { get; set; }
         public DateTimeOffset Start { get; set; }
         public DateTimeOffset? End { get; set; }
+        public ICollection<Group> Groups { get; set; } = new List<Group>();
 
-        public int GroupId { get; set; }
-        public Group Group { get; set; } = null!;
-
-        public ICollection<Attendance> Attendances { get; set; } = new List<Attendance>();
+        public ICollection<Student> Attendance { get; set; } = new List<Student>();
     }
 }

@@ -1,13 +1,15 @@
 using MediatR;
 using Attendo.Application.DTOs.Classes;
+using Attendo.Application.DTOs.Groups;
 
 namespace Attendo.Application.Classes.Commands.UpdateClass
 {
     public class UpdateClassCommand : IRequest<ClassDto?>
     {
         public int Id { get; set; }
-        public DateTime Start { get; set; }
-        public DateTime End { get; set; }
-        public int GroupId { get; set; }
+        public DateTimeOffset Start { get; set; }
+        public DateTimeOffset? End { get; set; }
+
+        public List<GroupDto> Groups { get; set; } = new();
     }
 }

@@ -2,6 +2,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Attendo.Application.Classes.Queries;
 using Attendo.Application.DTOs.Classes;
+using Attendo.Application.DTOs.Groups;
 using Attendo.Application.Interfaces;
 
 namespace Attendo.Persistence.Classes.Handlers.GetClassById
@@ -15,16 +16,17 @@ namespace Attendo.Persistence.Classes.Handlers.GetClassById
         {
             var entity = await _db.Classes
                 .AsNoTracking()
+                .Include(c => c.Groups)
                 .FirstOrDefaultAsync(c => c.Id == request.Id, ct);
 
             if (entity is null) return null;
 
             return new ClassDto
             {
-                Id      = entity.Id,
-                Start   = entity.Start,
-                End     = entity.End,
-                GroupId = entity.GroupId
+                Id    = entity.Id,
+                Start = entity.Start,
+                End   = entity.End,
+                Groups = entity.Groups.Select(g => new GroupDto { Id = g.Id, Title = g.Title }).ToList()
             };
         }
     }

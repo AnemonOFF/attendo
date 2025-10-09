@@ -20,6 +20,7 @@
     <ProjectReference Include="..\..\Core\Attendo.Application\Attendo.Application.csproj" />
     <ProjectReference Include="..\..\Shared\Attendo.Shared\Attendo.Shared.csproj" />
     <ProjectReference Include="..\..\Infrastructure\Attendo.Persistence\Attendo.Persistence.csproj" />
+    <ProjectReference Include="..\..\Infrastructure\Attendo.Infrastructure\Attendo.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

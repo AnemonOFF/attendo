@@ -3,6 +3,7 @@ using System;
 using Attendo.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Attendo.Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251009200513_SyncModel_1")]
+    partial class SyncModel_1
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,6 +24,32 @@ namespace Attendo.Persistence.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+
+            modelBuilder.Entity("Attendo.Domain.Entities.Attendance", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ClassId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("StudentId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ClassId");
+
+                    b.HasIndex("StudentId");
+
+                    b.ToTable("Attendances");
+                });
 
             modelBuilder.Entity("Attendo.Domain.Entities.Class", b =>
                 {
@@ -71,9 +100,6 @@ namespace Attendo.Persistence.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("ClassId")
-                        .HasColumnType("integer");
-
                     b.Property<string>("FullName")
                         .IsRequired()
                         .HasColumnType("text");
@@ -82,8 +108,6 @@ namespace Attendo.Persistence.Migrations
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ClassId");
 
                     b.HasIndex("GroupId");
 
@@ -122,6 +146,25 @@ namespace Attendo.Persistence.Migrations
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("Attendo.Domain.Entities.Attendance", b =>
+                {
+                    b.HasOne("Attendo.Domain.Entities.Class", "Class")
+                        .WithMany("Attendance")
+                        .HasForeignKey("ClassId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Attendo.Domain.Entities.Student", "Student")
+                        .WithMany("Attendances")
+                        .HasForeignKey("StudentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Class");
+
+                    b.Navigation("Student");
+                });
+
             modelBuilder.Entity("Attendo.Domain.Entities.Group", b =>
                 {
                     b.HasOne("Attendo.Domain.Entities.Class", null)
@@ -131,10 +174,6 @@ namespace Attendo.Persistence.Migrations
 
             modelBuilder.Entity("Attendo.Domain.Entities.Student", b =>
                 {
-                    b.HasOne("Attendo.Domain.Entities.Class", null)
-                        .WithMany("Attendance")
-                        .HasForeignKey("ClassId");
-
                     b.HasOne("Attendo.Domain.Entities.Group", null)
                         .WithMany("Students")
                         .HasForeignKey("GroupId");
@@ -150,6 +189,11 @@ namespace Attendo.Persistence.Migrations
             modelBuilder.Entity("Attendo.Domain.Entities.Group", b =>
                 {
                     b.Navigation("Students");
+                });
+
+            modelBuilder.Entity("Attendo.Domain.Entities.Student", b =>
+                {
+                    b.Navigation("Attendances");
                 });
 #pragma warning restore 612, 618
         }

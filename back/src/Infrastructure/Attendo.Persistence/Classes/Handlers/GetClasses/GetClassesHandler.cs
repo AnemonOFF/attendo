@@ -1,7 +1,9 @@
+// GetClassesHandler.cs
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Attendo.Application.Classes.Queries;
 using Attendo.Application.DTOs.Classes;
+using Attendo.Application.DTOs.Groups;
 using Attendo.Application.Interfaces;
 
 namespace Attendo.Persistence.Classes.Handlers.GetClasses
@@ -15,13 +17,17 @@ namespace Attendo.Persistence.Classes.Handlers.GetClasses
         {
             var items = await _db.Classes
                 .AsNoTracking()
+                .Include(c => c.Groups)
                 .OrderBy(c => c.Start)
                 .Select(c => new ClassResponse
                 {
                     Id = c.Id,
                     Start = c.Start,
                     End = c.End,
-                    GroupId = c.GroupId
+                    Groups = c.Groups
+                        .Select(g => new GroupDto { Id = g.Id, Title = g.Title })
+                        .ToList(),
+                    Attendance = new List<int>()
                 })
                 .ToListAsync(ct);
 
