@@ -1,8 +1,8 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
+    <ProjectReference Include="..\Attendo.Shared\Attendo.Shared.csproj" />
     <ProjectReference Include="..\Attendo.Domain\Attendo.Domain.csproj" />
-    <ProjectReference Include="..\..\Shared\Attendo.Shared\Attendo.Shared.csproj" />
   </ItemGroup>
 
   <ItemGroup>
