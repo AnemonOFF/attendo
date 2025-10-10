@@ -60,11 +60,11 @@ jobs:
           dotnet tool install --global dotnet-sonarscanner
 
       - name: Run .NET format check
-        working-directory: ./back/src
+        working-directory: ./back
         run: dotnet format --verify-no-changes --verbosity diagnostic
 
       - name: Run .NET analyzers
-        working-directory: ./back/src
+        working-directory: ./back
         run: dotnet build --configuration Release --verbosity normal
 
   dependency-check:
