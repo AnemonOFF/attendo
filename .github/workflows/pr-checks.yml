@@ -44,29 +44,29 @@ jobs:
         run: npm run build
 
       - name: Backend restore
-        working-directory: ./back
+        working-directory: ./back/src
         run: dotnet restore
 
       - name: Backend build check
-        working-directory: ./back
+        working-directory: ./back/src
         run: dotnet build --configuration Release --no-restore
 
       - name: Backend test
-        working-directory: ./back
+        working-directory: ./back/src
         run: dotnet test --configuration Release --no-build --verbosity normal
         continue-on-error: true
 
       - name: Check for TODO/FIXME comments
         run: |
           echo "Checking for TODO/FIXME comments in code..."
-          if grep -r "TODO\|FIXME" front/src/ back/ --exclude-dir=node_modules --exclude-dir=bin --exclude-dir=obj; then
+          if grep -r "TODO\|FIXME" front/src/ back/src/ --exclude-dir=node_modules --exclude-dir=bin --exclude-dir=obj; then
             echo "::warning::Found TODO/FIXME comments in the code. Consider addressing them before merging."
           fi
 
       - name: Check file sizes
         run: |
           echo "Checking for large files..."
-          find . -type f -size +1M -not -path "./node_modules/*" -not -path "./.git/*" -not -path "./back/bin/*" -not -path "./back/obj/*" | head -10
+          find . -type f -size +1M -not -path "./node_modules/*" -not -path "./.git/*" -not -path "./back/src/*/bin/*" -not -path "./back/src/*/obj/*" | head -10
 
       - name: Generate PR summary
         run: |

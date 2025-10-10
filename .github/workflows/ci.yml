@@ -67,27 +67,27 @@ jobs:
             ${{ runner.os }}-nuget-
 
       - name: Restore dependencies
-        working-directory: ./back
+        working-directory: ./back/src
         run: dotnet restore
 
       - name: Build backend
-        working-directory: ./back
+        working-directory: ./back/src
         run: dotnet build --configuration Release --no-restore
 
       - name: Run tests (if any)
-        working-directory: ./back
+        working-directory: ./back/src
         run: dotnet test --configuration Release --no-build --verbosity normal
         continue-on-error: true
 
       - name: Publish backend
-        working-directory: ./back
+        working-directory: ./back/src/Presentation/Attendo.WebAPI
         run: dotnet publish --configuration Release --no-build --output ./publish
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
           name: backend-publish
-          path: back/publish/
+          path: back/src/Presentation/Attendo.WebAPI/publish/
           retention-days: 7
 
   docker-build:
@@ -115,8 +115,8 @@ jobs:
       - name: Build backend Docker image
         uses: docker/build-push-action@v5
         with:
-          context: ./back
-          file: ./back/Dockerfile
+          context: ./back/src/Presentation/Attendo.WebAPI
+          file: ./back/src/Presentation/Attendo.WebAPI/Dockerfile
           push: false
           tags: attendo-backend:latest
           cache-from: type=gha

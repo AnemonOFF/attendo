@@ -60,11 +60,11 @@ jobs:
           dotnet tool install --global dotnet-sonarscanner
 
       - name: Run .NET format check
-        working-directory: ./back
+        working-directory: ./back/src
         run: dotnet format --verify-no-changes --verbosity diagnostic
 
       - name: Run .NET analyzers
-        working-directory: ./back
+        working-directory: ./back/src
         run: dotnet build --configuration Release --verbosity normal
 
   dependency-check:
@@ -96,9 +96,9 @@ jobs:
           dotnet-version: "9.0.x"
 
       - name: Restore dependencies
-        working-directory: ./back
+        working-directory: ./back/src
         run: dotnet restore
 
       - name: Run .NET security check
-        working-directory: ./back
+        working-directory: ./back/src
         run: dotnet list package --vulnerable --include-transitive
