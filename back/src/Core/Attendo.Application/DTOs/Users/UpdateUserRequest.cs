@@ -4,6 +4,6 @@ namespace Attendo.Application.DTOs.Users
     {
         public string Email { get; set; } = string.Empty;
         public string Role { get; set; } = "User";
-        public string? NewPassword { get; set; } 
+        public string? NewPassword { get; set; }
     }
 }

@@ -23,9 +23,9 @@ namespace Attendo.Persistence.Classes.Handlers.GetClassById
 
             return new ClassDto
             {
-                Id    = entity.Id,
+                Id = entity.Id,
                 Start = entity.Start,
-                End   = entity.End,
+                End = entity.End,
                 Groups = entity.Groups.Select(g => new GroupDto { Id = g.Id, Title = g.Title }).ToList()
             };
         }

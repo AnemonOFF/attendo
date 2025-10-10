@@ -33,7 +33,7 @@ namespace Attendo.Persistence.Classes.Handlers
             var entity = new Class
             {
                 Start = request.Start,
-                End   = request.End,
+                End = request.End,
                 Groups = groups
             };
 
@@ -42,9 +42,9 @@ namespace Attendo.Persistence.Classes.Handlers
 
             return new ClassDto
             {
-                Id    = entity.Id,
+                Id = entity.Id,
                 Start = entity.Start,
-                End   = entity.End,
+                End = entity.End,
                 Groups = entity.Groups.Select(g => new GroupDto { Id = g.Id, Title = g.Title }).ToList()
             };
         }

@@ -4,5 +4,5 @@ using Attendo.Application.DTOs.Groups;
 
 namespace Attendo.Application.Groups.Queries
 {
-    public class GetGroupsQuery : IRequest<IReadOnlyList<GroupDto>> {}
+    public class GetGroupsQuery : IRequest<IReadOnlyList<GroupDto>> { }
 }

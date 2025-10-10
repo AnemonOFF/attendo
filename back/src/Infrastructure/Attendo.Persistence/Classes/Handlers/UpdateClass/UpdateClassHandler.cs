@@ -21,7 +21,7 @@ namespace Attendo.Persistence.Classes.Handlers.UpdateClass
             if (entity is null) return null;
 
             entity.Start = request.Start;
-            entity.End   = request.End;
+            entity.End = request.End;
 
             var requestedGroupIds = request.Groups?.Select(g => g.Id).Distinct().ToList() ?? new List<int>();
             var groups = requestedGroupIds.Count == 0
@@ -42,9 +42,9 @@ namespace Attendo.Persistence.Classes.Handlers.UpdateClass
 
             return new ClassDto
             {
-                Id    = entity.Id,
+                Id = entity.Id,
                 Start = entity.Start,
-                End   = entity.End,
+                End = entity.End,
                 Groups = entity.Groups.Select(g => new GroupDto { Id = g.Id, Title = g.Title }).ToList()
             };
         }

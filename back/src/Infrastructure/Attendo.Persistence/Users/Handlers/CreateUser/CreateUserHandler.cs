@@ -23,7 +23,7 @@ namespace Attendo.Persistence.Users.Handlers.CreateUser
             {
                 Login = request.Login,
                 Email = request.Email,
-                Role  = request.Role,
+                Role = request.Role,
                 PasswordHash = HashPassword(request.Password),
                 CreatedAt = DateTimeOffset.UtcNow
             };

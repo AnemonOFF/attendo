@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore;
 using MediatR;
 using Attendo.Application.Interfaces;
 
-namespace Attendo.Persistence  
+namespace Attendo.Persistence
 {
-    public static class DependencyInjection  
+    public static class DependencyInjection
     {
         public static IServiceCollection AddPersistence(this IServiceCollection services, IConfiguration config)
         {

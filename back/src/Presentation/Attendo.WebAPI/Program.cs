@@ -13,8 +13,8 @@ builder.Services.AddPersistence(builder.Configuration);
 
 builder.Services.AddMediatR(cfg =>
     cfg.RegisterServicesFromAssemblies(
-        typeof(Attendo.Application.DependencyInjection).Assembly, 
-        typeof(AppDbContext).Assembly                            
+        typeof(Attendo.Application.DependencyInjection).Assembly,
+        typeof(AppDbContext).Assembly
     )
 );
 

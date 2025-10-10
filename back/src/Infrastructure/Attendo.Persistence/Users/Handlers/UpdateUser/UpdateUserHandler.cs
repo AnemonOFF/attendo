@@ -19,7 +19,7 @@ namespace Attendo.Persistence.Users.Handlers.UpdateUser
             if (entity is null) return null;
 
             entity.Email = request.Email;
-            entity.Role  = request.Role;
+            entity.Role = request.Role;
 
             if (!string.IsNullOrWhiteSpace(request.NewPassword))
             {
