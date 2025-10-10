@@ -115,8 +115,8 @@ jobs:
       - name: Build backend Docker image
         uses: docker/build-push-action@v5
         with:
-          context: ./back/src/Presentation/Attendo.WebAPI
-          file: ./back/src/Presentation/Attendo.WebAPI/Dockerfile
+          context: ./back/src
+          file: ./back/src/Dockerfile
           push: false
           tags: attendo-backend:latest
           cache-from: type=gha
