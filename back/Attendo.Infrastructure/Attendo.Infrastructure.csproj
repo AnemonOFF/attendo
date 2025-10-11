@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="..\Attendo.Application\Attendo.Application.csproj" />
+    <ProjectReference Include="..\Attendo.Persistence\Attendo.Persistence.csproj" />
+    <ProjectReference Include="..\Attendo.Shared\Attendo.Shared.csproj" />
+    <ProjectReference Include="..\Attendo.Domain\Attendo.Domain.csproj" />
+  </ItemGroup>
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+    <GenerateTargetFrameworkAttribute>true</GenerateTargetFrameworkAttribute>
+  </PropertyGroup>
+</Project>
