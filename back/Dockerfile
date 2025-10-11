@@ -3,8 +3,8 @@ FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /src
 
 # Copy csproj and restore dependencies
-COPY ["Attendo.WebAPI/Attendo.WebAPI.csproj", "./"]
-RUN dotnet restore "Attendo.WebAPI/Attendo.WebAPI.csproj"
+COPY Attendo.WebAPI/Attendo.WebAPI.csproj Attendo.WebAPI/
+RUN dotnet restore Attendo.WebAPI/Attendo.WebAPI.csproj
 
 # Copy the rest of the source code
 COPY . .
