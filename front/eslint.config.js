@@ -120,7 +120,20 @@ export default defineConfig([
       "unicorn/prefer-optional-catch-binding": "warn",
 
       // Prettier - formatting integration (set to warn to avoid blocking)
-      "prettier/prettier": "warn",
+      "prettier/prettier": [
+        "warn",
+        {
+          singleQuote: true,
+		  parser: "flow",
+          semi: true,
+          trailingComma: "es5",
+          tabWidth: 4,
+          useTabs: true,
+          printWidth: 100,
+          arrowParens: "avoid",
+          endOfLine: "auto",
+        },
+      ],
     },
   },
 ]);
