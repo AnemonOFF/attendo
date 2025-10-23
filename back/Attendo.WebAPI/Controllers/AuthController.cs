@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Attendo.Application.DTOs.Auth;
 using Attendo.Domain.Entities;
 using Attendo.Infrastructure.Auth;
@@ -10,7 +11,6 @@ namespace Attendo.WebAPI.Controllers;
 
 [ApiController]
 [Route("auth")]
-[AllowAnonymous]
 public class AuthController : ControllerBase
 {
     private readonly IUserRepository _users;
@@ -24,6 +24,7 @@ public class AuthController : ControllerBase
         _jwt = jwt;
     }
 
+    [AllowAnonymous]
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterRequest req, CancellationToken ct)
     {
@@ -45,6 +46,7 @@ public class AuthController : ControllerBase
         return Ok(new { user.Id, user.Login, user.Email, user.Role });
     }
 
+    [AllowAnonymous]
     [HttpPost("login")]
     public async Task<ActionResult<AuthResponse>> Login([FromBody] LoginRequest req, CancellationToken ct)
     {
@@ -56,5 +58,24 @@ public class AuthController : ControllerBase
 
         var (token, exp) = _jwt.CreateToken(user);
         return Ok(new AuthResponse { AccessToken = token, ExpiresAt = exp });
+    }
+
+    [Authorize]
+    [HttpGet("me")]
+    public async Task<ActionResult<AuthUserResponse>> Me(CancellationToken ct)
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (userId == null) return Unauthorized();
+
+        var user = await _users.FindByLoginOrEmailAsync(User.Identity!.Name!, ct);
+        if (user is null) return Unauthorized();
+
+        return Ok(new AuthUserResponse
+        {
+            Id = user.Id,
+            Login = user.Login,
+            Email = user.Email,
+            Role = user.Role
+        });
     }
 }
