@@ -53,7 +53,7 @@ var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwt["Key"]!));
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(opt =>
     {
-        opt.RequireHttpsMetadata = false; 
+        opt.RequireHttpsMetadata = false;
         opt.SaveToken = true;
         opt.TokenValidationParameters = new TokenValidationParameters
         {
