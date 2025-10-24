@@ -4,7 +4,7 @@ services:
   # Backend API service
   backend:
     build:
-      context: ../back
+      context: ../back/src
       dockerfile: Dockerfile
     container_name: attendo-backend
     ports:
