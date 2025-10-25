@@ -16,6 +16,11 @@ services:
     networks:
       - attendo-network
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d atendo_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   # Backend API service
   backend:
@@ -30,7 +35,8 @@ services:
       - ASPNETCORE_URLS=http://+:8080
       - ConnectionStrings__Default=Host=database;Port=5432;Database=atendo_db;Username=postgres;Password=miarel
     depends_on:
-      - database
+      database:
+        condition: service_healthy
     networks:
       - attendo-network
     restart: unless-stopped
