@@ -38,7 +38,7 @@ namespace Attendo.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Classes");
+                    b.ToTable("classes", (string)null);
                 });
 
             modelBuilder.Entity("Attendo.Domain.Entities.Group", b =>
@@ -60,7 +60,7 @@ namespace Attendo.Persistence.Migrations
 
                     b.HasIndex("ClassId");
 
-                    b.ToTable("Groups");
+                    b.ToTable("groups", (string)null);
                 });
 
             modelBuilder.Entity("Attendo.Domain.Entities.Student", b =>
@@ -87,7 +87,7 @@ namespace Attendo.Persistence.Migrations
 
                     b.HasIndex("GroupId");
 
-                    b.ToTable("Students");
+                    b.ToTable("students", (string)null);
                 });
 
             modelBuilder.Entity("Attendo.Domain.Entities.User", b =>
@@ -99,27 +99,41 @@ namespace Attendo.Persistence.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<DateTimeOffset>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.Property<string>("Email")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
 
                     b.Property<string>("Login")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
 
                     b.Property<string>("PasswordHash")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(512)
+                        .HasColumnType("character varying(512)");
 
                     b.Property<string>("Role")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(32)
+                        .HasColumnType("character varying(32)")
+                        .HasDefaultValue("User");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Users");
+                    b.HasIndex("Email")
+                        .IsUnique();
+
+                    b.HasIndex("Login")
+                        .IsUnique();
+
+                    b.ToTable("users", (string)null);
                 });
 
             modelBuilder.Entity("Attendo.Domain.Entities.Group", b =>
