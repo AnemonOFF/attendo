@@ -1,8 +1,8 @@
-using MediatR;
-using Microsoft.EntityFrameworkCore;
-using Attendo.Application.Users.Queries.GetUsers;
 using Attendo.Application.DTOs.Users;
 using Attendo.Application.Interfaces;
+using Attendo.Application.Users.Queries.GetUsers;
+using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 namespace Attendo.Persistence.Users.Handlers.GetUsers
 {

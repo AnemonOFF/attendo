@@ -1,8 +1,8 @@
-using MediatR;
 using Attendo.Application.DTOs.Students;
-using Attendo.Application.Students.Commands;
 using Attendo.Application.Interfaces;
+using Attendo.Application.Students.Commands;
 using Attendo.Domain.Entities;
+using MediatR;
 
 namespace Attendo.Persistence.Students.Handlers
 {

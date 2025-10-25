@@ -1,9 +1,9 @@
-using MediatR;
-using Microsoft.EntityFrameworkCore;
 using Attendo.Application.Classes.Commands.SetAttendance;
 using Attendo.Application.DTOs.Classes;
 using Attendo.Application.DTOs.Groups;
 using Attendo.Application.Interfaces;
+using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 namespace Attendo.Persistence.Classes.Handlers.SetAttendance
 {
@@ -20,7 +20,9 @@ namespace Attendo.Persistence.Classes.Handlers.SetAttendance
                 .FirstOrDefaultAsync(c => c.Id == request.ClassId, ct);
 
             if (entity is null)
+            {
                 throw new KeyNotFoundException($"Class {request.ClassId} not found");
+            }
 
             var ids = request.StudentIds?.Distinct().ToList() ?? new List<int>();
             var students = ids.Count == 0
@@ -35,7 +37,10 @@ namespace Attendo.Persistence.Classes.Handlers.SetAttendance
             }
 
             entity.Attendance.Clear();
-            foreach (var s in students) entity.Attendance.Add(s);
+            foreach (var s in students)
+            {
+                entity.Attendance.Add(s);
+            }
 
             await _db.SaveChangesAsync(ct);
 

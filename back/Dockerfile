@@ -2,8 +2,14 @@
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /src
 
-# Copy csproj and restore dependencies
+# Copy csproj files and restore dependencies
 COPY Attendo.WebAPI/Attendo.WebAPI.csproj Attendo.WebAPI/
+COPY Attendo.Application/Attendo.Application.csproj Attendo.Application/
+COPY Attendo.Domain/Attendo.Domain.csproj Attendo.Domain/
+COPY Attendo.Infrastructure/Attendo.Infrastructure.csproj Attendo.Infrastructure/
+COPY Attendo.Persistence/Attendo.Persistence.csproj Attendo.Persistence/
+COPY Attendo.Shared/Attendo.Shared.csproj Attendo.Shared/
+
 RUN dotnet restore Attendo.WebAPI/Attendo.WebAPI.csproj
 
 # Copy the rest of the source code
@@ -27,5 +33,5 @@ COPY --from=publish /app/publish .
 EXPOSE 8080
 
 # Set the entry point
-ENTRYPOINT ["dotnet", "Attendo.WebAPI/Attendo.WebAPI.dll"]
+ENTRYPOINT ["dotnet", "Attendo.WebAPI.dll"]
 

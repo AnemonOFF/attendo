@@ -1,9 +1,9 @@
 using System.Text;
 using Attendo.Application;
-using Attendo.Persistence;
 using Attendo.Infrastructure.Auth;
 using Attendo.Infrastructure.Security;
 using Attendo.Infrastructure.Users;
+using Attendo.Persistence;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -90,6 +90,22 @@ builder.Services.AddMediatR(cfg =>
     ));
 
 var app = builder.Build();
+
+// Apply database migrations on startup
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    try
+    {
+        context.Database.Migrate();
+        Console.WriteLine("Database migrations applied successfully.");
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Error applying database migrations: {ex.Message}");
+        throw;
+    }
+}
 
 if (app.Environment.IsDevelopment())
 {

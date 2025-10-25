@@ -2,12 +2,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using MediatR;
 using Attendo.Application.DTOs;
+using Attendo.Application.DTOs.Groups;
 using Attendo.Application.Groups.Queries;
 using Attendo.Application.Interfaces;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
-using Attendo.Application.DTOs.Groups;
 
 namespace Attendo.Persistence.Groups.Handlers
 {

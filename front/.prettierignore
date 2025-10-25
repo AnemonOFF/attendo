@@ -33,3 +33,9 @@ Thumbs.db
 *.ico
 Dockerfile
 .gitignore
+
+# Configuration files
+.prettierrc
+.prettierignore
+nginx.conf
+eslint.config.js

@@ -1,10 +1,10 @@
-using MediatR;
-using Microsoft.AspNetCore.Mvc;
 using Attendo.Application.Classes.Commands.CreateClass;
-using Attendo.Application.Classes.Commands.UpdateClass;
 using Attendo.Application.Classes.Commands.SetAttendance;
+using Attendo.Application.Classes.Commands.UpdateClass;
 using Attendo.Application.Classes.Queries;
 using Attendo.Application.DTOs.Classes;
+using MediatR;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Attendo.WebAPI.Controllers
 {
@@ -26,7 +26,11 @@ namespace Attendo.WebAPI.Controllers
         public async Task<ActionResult<ClassDto>> GetById(int id, CancellationToken ct)
         {
             var result = await _mediator.Send(new GetClassByIdQuery { Id = id }, ct);
-            if (result is null) return NotFound();
+            if (result is null)
+            {
+                return NotFound();
+            }
+
             return Ok(result);
         }
 
@@ -40,10 +44,16 @@ namespace Attendo.WebAPI.Controllers
         [HttpPut("{id:int}")]
         public async Task<ActionResult<ClassDto>> Update(int id, [FromBody] UpdateClassCommand command, CancellationToken ct)
         {
-            if (id != command.Id) return BadRequest("ID in URL and body do not match.");
+            if (id != command.Id)
+            {
+                return BadRequest("ID in URL and body do not match.");
+            }
 
             var result = await _mediator.Send(command, ct);
-            if (result is null) return NotFound();
+            if (result is null)
+            {
+                return NotFound();
+            }
 
             return Ok(result);
         }

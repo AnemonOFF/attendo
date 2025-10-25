@@ -1,7 +1,7 @@
+using Attendo.Application.Interfaces;
+using Attendo.Application.Students.Commands;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using Attendo.Application.Students.Commands;
-using Attendo.Application.Interfaces;
 
 namespace Attendo.Persistence.Students.Handlers
 {
@@ -13,7 +13,10 @@ namespace Attendo.Persistence.Students.Handlers
         public async Task<bool> Handle(DeleteStudentCommand request, CancellationToken ct)
         {
             var entity = await _db.Students.FirstOrDefaultAsync(s => s.Id == request.Id, ct);
-            if (entity is null) return false;
+            if (entity is null)
+            {
+                return false;
+            }
 
             _db.Students.Remove(entity);
             await _db.SaveChangesAsync(ct);

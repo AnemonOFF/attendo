@@ -1,10 +1,10 @@
-using MediatR;
-using Microsoft.EntityFrameworkCore;
-using Attendo.Application.Users.Commands.UpdateUser;
-using Attendo.Application.DTOs.Users;
-using Attendo.Application.Interfaces;
 using System.Security.Cryptography;
 using System.Text;
+using Attendo.Application.DTOs.Users;
+using Attendo.Application.Interfaces;
+using Attendo.Application.Users.Commands.UpdateUser;
+using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 namespace Attendo.Persistence.Users.Handlers.UpdateUser
 {
@@ -16,7 +16,10 @@ namespace Attendo.Persistence.Users.Handlers.UpdateUser
         public async Task<UserResponse?> Handle(UpdateUserCommand request, CancellationToken ct)
         {
             var entity = await _db.Users.FirstOrDefaultAsync(u => u.Id == request.Id, ct);
-            if (entity is null) return null;
+            if (entity is null)
+            {
+                return null;
+            }
 
             entity.Email = request.Email;
             entity.Role = request.Role;

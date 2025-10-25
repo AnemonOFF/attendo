@@ -1,8 +1,8 @@
-using Microsoft.AspNetCore.Mvc;
-using MediatR;
 using Attendo.Application.DTOs.Students;
 using Attendo.Application.Students.Commands;
 using Attendo.Application.Students.Queries;
+using MediatR;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Attendo.WebAPI.Controllers
 {

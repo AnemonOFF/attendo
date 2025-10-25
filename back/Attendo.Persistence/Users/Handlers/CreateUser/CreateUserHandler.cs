@@ -1,11 +1,11 @@
-using MediatR;
-using Microsoft.EntityFrameworkCore;
-using Attendo.Application.Users.Commands.CreateUser;
-using Attendo.Application.DTOs.Users;
-using Attendo.Application.Interfaces;
-using Attendo.Domain.Entities;
 using System.Security.Cryptography;
 using System.Text;
+using Attendo.Application.DTOs.Users;
+using Attendo.Application.Interfaces;
+using Attendo.Application.Users.Commands.CreateUser;
+using Attendo.Domain.Entities;
+using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 namespace Attendo.Persistence.Users.Handlers.CreateUser
 {
@@ -17,7 +17,10 @@ namespace Attendo.Persistence.Users.Handlers.CreateUser
         public async Task<UserResponse> Handle(CreateUserCommand request, CancellationToken ct)
         {
             var exists = await _db.Users.AnyAsync(u => u.Login == request.Login || u.Email == request.Email, ct);
-            if (exists) throw new InvalidOperationException("User with the same login or email already exists.");
+            if (exists)
+            {
+                throw new InvalidOperationException("User with the same login or email already exists.");
+            }
 
             var entity = new User
             {

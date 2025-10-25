@@ -1,9 +1,9 @@
-using MediatR;
-using Microsoft.EntityFrameworkCore;
 using Attendo.Application.Classes.Commands.UpdateClass;
 using Attendo.Application.DTOs.Classes;
 using Attendo.Application.DTOs.Groups;
 using Attendo.Application.Interfaces;
+using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 namespace Attendo.Persistence.Classes.Handlers.UpdateClass
 {
@@ -18,7 +18,10 @@ namespace Attendo.Persistence.Classes.Handlers.UpdateClass
                 .Include(c => c.Groups)
                 .FirstOrDefaultAsync(c => c.Id == request.Id, ct);
 
-            if (entity is null) return null;
+            if (entity is null)
+            {
+                return null;
+            }
 
             entity.Start = request.Start;
             entity.End = request.End;
@@ -36,7 +39,10 @@ namespace Attendo.Persistence.Classes.Handlers.UpdateClass
             }
 
             entity.Groups.Clear();
-            foreach (var g in groups) entity.Groups.Add(g);
+            foreach (var g in groups)
+            {
+                entity.Groups.Add(g);
+            }
 
             await _db.SaveChangesAsync(ct);
 

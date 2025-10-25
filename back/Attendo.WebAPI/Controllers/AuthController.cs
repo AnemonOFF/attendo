@@ -29,10 +29,14 @@ public class AuthController : ControllerBase
     public async Task<IActionResult> Register([FromBody] RegisterRequest req, CancellationToken ct)
     {
         if (await _users.ExistsLoginAsync(req.Login, ct))
+        {
             return Conflict(new { field = "login", message = "taken" });
+        }
 
         if (await _users.ExistsEmailAsync(req.Email, ct))
+        {
             return Conflict(new { field = "email", message = "taken" });
+        }
 
         var user = new User
         {
@@ -51,10 +55,15 @@ public class AuthController : ControllerBase
     public async Task<ActionResult<AuthResponse>> Login([FromBody] LoginRequest req, CancellationToken ct)
     {
         var user = await _users.FindByLoginOrEmailAsync(req.Login.Trim(), ct);
-        if (user is null) return Unauthorized(new { message = "Invalid credentials" });
+        if (user is null)
+        {
+            return Unauthorized(new { message = "Invalid credentials" });
+        }
 
         if (!_hasher.Verify(req.Password, user.PasswordHash))
+        {
             return Unauthorized(new { message = "Invalid credentials" });
+        }
 
         var (token, exp) = _jwt.CreateToken(user);
         return Ok(new AuthResponse { AccessToken = token, ExpiresAt = exp });
@@ -65,10 +74,16 @@ public class AuthController : ControllerBase
     public async Task<ActionResult<AuthUserResponse>> Me(CancellationToken ct)
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        if (userId == null) return Unauthorized();
+        if (userId == null)
+        {
+            return Unauthorized();
+        }
 
         var user = await _users.FindByLoginOrEmailAsync(User.Identity!.Name!, ct);
-        if (user is null) return Unauthorized();
+        if (user is null)
+        {
+            return Unauthorized();
+        }
 
         return Ok(new AuthUserResponse
         {

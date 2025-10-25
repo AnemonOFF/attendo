@@ -23,7 +23,10 @@ public class Sha256PasswordHasher : IPasswordHasher
         try
         {
             var parts = storedHash.Split('$');
-            if (parts.Length != 3 || parts[0] != "SHA256") return false;
+            if (parts.Length != 3 || parts[0] != "SHA256")
+            {
+                return false;
+            }
 
             var salt = parts[1];
             var expectedHash = parts[2];

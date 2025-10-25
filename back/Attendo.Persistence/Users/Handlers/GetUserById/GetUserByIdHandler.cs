@@ -1,8 +1,8 @@
-using MediatR;
-using Microsoft.EntityFrameworkCore;
-using Attendo.Application.Users.Queries.GetUserById;
 using Attendo.Application.DTOs.Users;
 using Attendo.Application.Interfaces;
+using Attendo.Application.Users.Queries.GetUserById;
+using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 namespace Attendo.Persistence.Users.Handlers.GetUserById
 {
@@ -14,7 +14,10 @@ namespace Attendo.Persistence.Users.Handlers.GetUserById
         public async Task<UserResponse?> Handle(GetUserByIdQuery request, CancellationToken ct)
         {
             var entity = await _db.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Id == request.Id, ct);
-            if (entity is null) return null;
+            if (entity is null)
+            {
+                return null;
+            }
 
             return new UserResponse
             {

@@ -1,5 +1,5 @@
-using MediatR;
 using Attendo.Application.DTOs.Users;
+using MediatR;
 
 namespace Attendo.Application.Users.Commands.UpdateUser
 {

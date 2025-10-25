@@ -1,4 +1,4 @@
-﻿using Attendo.Application.Interfaces;
+using Attendo.Application.Interfaces;
 using Attendo.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
