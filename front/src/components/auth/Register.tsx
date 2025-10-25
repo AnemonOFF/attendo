@@ -166,7 +166,7 @@ const Register: React.FC = () => {
     Partial<Record<keyof RegisterFormData, string>>
   >({});
   const [focusedField, setFocusedField] = useState<string>("");
-  const [_, setIsLoading] = useState(false);
+  // const [isLoading, setIsLoading] = useState(false);
   const [apiError, setApiError] = useState("");
 
   const validateForm = (): boolean => {
@@ -215,7 +215,7 @@ const Register: React.FC = () => {
 
     if (!validateForm()) return;
 
-    setIsLoading(true);
+    // setIsLoading(true);
 
     try {
       // Use the registerMutation with correct field names
@@ -250,7 +250,7 @@ const Register: React.FC = () => {
         setApiError("Registration failed. Please try again.");
       }
     } finally {
-      setIsLoading(false);
+      // setIsLoading(false);
     }
   };
 

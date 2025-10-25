@@ -29,7 +29,7 @@ const Login: React.FC = () => {
 
   const [errors, setErrors] = useState<FormErrors>({});
   const [focusedField, setFocusedField] = useState<string>("");
-  const [_, setIsLoading] = useState(false);
+  // const [isLoading, setIsLoading] = useState(false);
   const [apiError, setApiError] = useState("");
 
   // Theme colors
@@ -76,7 +76,7 @@ const Login: React.FC = () => {
 
     if (!validateForm()) return;
 
-    setIsLoading(true);
+    // setIsLoading(true);
 
     try {
       // // Use the loginMutation with correct field names

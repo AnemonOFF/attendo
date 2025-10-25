@@ -8,11 +8,11 @@ import {
 
 import "./App.css";
 // Import auth components
+import AttendanceCalendar from "./components/AttendanceCalendar";
 import Login from "./components/auth/Login";
 import RecoverPassword from "./components/auth/RecoverPassword";
 import Register from "./components/auth/Register";
 import SplashScreen from "./components/auth/SplashScreen";
-import Dashboard from "./components/Dashboard";
 
 function App() {
   return (
@@ -24,7 +24,7 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/recover" element={<RecoverPassword />} />
         <Route path="*" element={<Navigate to="/" replace />} />
-        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/calendar" element={<AttendanceCalendar />} />
       </Routes>
     </Router>
   );
