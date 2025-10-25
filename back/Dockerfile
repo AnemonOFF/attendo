@@ -27,5 +27,5 @@ COPY --from=publish /app/publish .
 EXPOSE 8080
 
 # Set the entry point
-ENTRYPOINT ["dotnet", "Attendo.WebAPI/Attendo.WebAPI.dll"]
+ENTRYPOINT ["dotnet", "Attendo.WebAPI.dll"]
 

@@ -1,10 +1,26 @@
 name: attendo
 
 services:
+  # Database service
+  database:
+    image: postgres:15
+    container_name: attendo-database
+    environment:
+      - POSTGRES_DB=atendo_db
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=miarel
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - attendo-network
+    restart: unless-stopped
+
   # Backend API service
   backend:
     build:
-      context: ../back/src
+      context: ../back
       dockerfile: Dockerfile
     container_name: attendo-backend
     ports:
@@ -12,6 +28,9 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:8080
+      - ConnectionStrings__Default=Host=database;Port=5432;Database=atendo_db;Username=postgres;Password=miarel
+    depends_on:
+      - database
     networks:
       - attendo-network
     restart: unless-stopped
@@ -29,6 +48,9 @@ services:
     networks:
       - attendo-network
     restart: unless-stopped
+
+volumes:
+  postgres_data:
 
 networks:
   attendo-network:

@@ -23,7 +23,7 @@ services:
   # Backend API service
   backend:
     build:
-      context: ../back/src
+      context: ../back
       dockerfile: Dockerfile
     container_name: attendo-backend
     environment:
