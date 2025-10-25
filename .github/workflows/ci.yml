@@ -10,6 +10,7 @@ jobs:
   frontend-lint-and-build:
     name: Frontend Lint & Build
     runs-on: ubuntu-latest
+    if: ${{ hashFiles('front/package.json') != '' }}
 
     steps:
       - name: Checkout code
