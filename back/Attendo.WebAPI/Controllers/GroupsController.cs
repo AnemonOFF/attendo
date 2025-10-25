@@ -12,50 +12,50 @@ namespace Attendo.WebAPI.Controllers;
 [Authorize]
 public class GroupsController : ControllerBase
 {
-  private readonly IMediator _mediator;
-  public GroupsController(IMediator mediator) => _mediator = mediator;
+    private readonly IMediator _mediator;
+    public GroupsController(IMediator mediator) => _mediator = mediator;
 
-  [HttpPost]
-  public async Task<ActionResult<GroupDto>> Create([FromBody] CreateGroupRequest body)
-  {
-    var result = await _mediator.Send(new CreateGroupCommand { Title = body.Title });
-    return Ok(result);
-  }
-
-  [HttpGet("{id:int}")]
-  public async Task<ActionResult<GroupDto>> GetById(int id)
-  {
-    var result = await _mediator.Send(new GetGroupByIdQuery { Id = id });
-    return result is null ? NotFound() : Ok(result);
-  }
-
-  [HttpGet]
-  public async Task<ActionResult<GroupsListResponse>> GetAll([FromQuery] int? offset, [FromQuery] int? limit)
-  {
-    var result = await _mediator.Send(new GetGroupsQuery
+    [HttpPost]
+    public async Task<ActionResult<GroupDto>> Create([FromBody] CreateGroupRequest body)
     {
-      Offset = offset,
-      Limit = limit
-    });
-    return Ok(result);
-  }
+        var result = await _mediator.Send(new CreateGroupCommand { Title = body.Title });
+        return Ok(result);
+    }
 
-  [HttpPut("{id:int}")]
-  public async Task<ActionResult<GroupDto>> Update(int id, [FromBody] UpdateGroupRequest body)
-  {
-    var result = await _mediator.Send(new UpdateGroupCommand
+    [HttpGet("{id:int}")]
+    public async Task<ActionResult<GroupDto>> GetById(int id)
     {
-      Id = id,
-      Title = body.Title,
-      Students = body.Students
-    });
-    return Ok(result);
-  }
+        var result = await _mediator.Send(new GetGroupByIdQuery { Id = id });
+        return result is null ? NotFound() : Ok(result);
+    }
 
-  [HttpDelete("{id:int}")]
-  public async Task<IActionResult> Delete(int id)
-  {
-    var ok = await _mediator.Send(new DeleteGroupCommand { Id = id });
-    return ok ? NoContent() : NotFound();
-  }
+    [HttpGet]
+    public async Task<ActionResult<GroupsListResponse>> GetAll([FromQuery] int? offset, [FromQuery] int? limit)
+    {
+        var result = await _mediator.Send(new GetGroupsQuery
+        {
+            Offset = offset,
+            Limit = limit
+        });
+        return Ok(result);
+    }
+
+    [HttpPut("{id:int}")]
+    public async Task<ActionResult<GroupDto>> Update(int id, [FromBody] UpdateGroupRequest body)
+    {
+        var result = await _mediator.Send(new UpdateGroupCommand
+        {
+            Id = id,
+            Title = body.Title,
+            Students = body.Students
+        });
+        return Ok(result);
+    }
+
+    [HttpDelete("{id:int}")]
+    public async Task<IActionResult> Delete(int id)
+    {
+        var ok = await _mediator.Send(new DeleteGroupCommand { Id = id });
+        return ok ? NoContent() : NotFound();
+    }
 }
