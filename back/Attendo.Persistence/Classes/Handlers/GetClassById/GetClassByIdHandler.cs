@@ -1,9 +1,9 @@
-using MediatR;
-using Microsoft.EntityFrameworkCore;
 using Attendo.Application.Classes.Queries;
 using Attendo.Application.DTOs.Classes;
 using Attendo.Application.DTOs.Groups;
 using Attendo.Application.Interfaces;
+using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 namespace Attendo.Persistence.Classes.Handlers.GetClassById
 {
@@ -19,7 +19,10 @@ namespace Attendo.Persistence.Classes.Handlers.GetClassById
                 .Include(c => c.Groups)
                 .FirstOrDefaultAsync(c => c.Id == request.Id, ct);
 
-            if (entity is null) return null;
+            if (entity is null)
+            {
+                return null;
+            }
 
             return new ClassDto
             {

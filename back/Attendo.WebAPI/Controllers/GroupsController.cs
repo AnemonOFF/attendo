@@ -1,9 +1,9 @@
-using MediatR;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authorization;
 using Attendo.Application.DTOs.Groups;
 using Attendo.Application.Groups.Commands;
 using Attendo.Application.Groups.Queries;
+using MediatR;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Attendo.WebAPI.Controllers;
 

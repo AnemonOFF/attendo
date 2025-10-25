@@ -1,10 +1,10 @@
-using MediatR;
-using Microsoft.EntityFrameworkCore;
 using Attendo.Application.Classes.Commands.CreateClass;
 using Attendo.Application.DTOs.Classes;
 using Attendo.Application.DTOs.Groups;
 using Attendo.Application.Interfaces;
 using Attendo.Domain.Entities;
+using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 namespace Attendo.Persistence.Classes.Handlers
 {
@@ -16,7 +16,9 @@ namespace Attendo.Persistence.Classes.Handlers
         public async Task<ClassDto> Handle(CreateClassCommand request, CancellationToken ct)
         {
             if (request.End.HasValue && request.End.Value < request.Start)
+            {
                 throw new ArgumentException("End date must be greater than or equal to Start date.", nameof(request.End));
+            }
 
             var requestedGroupIds = request.Groups?.Select(g => g.Id).Distinct().ToList() ?? new List<int>();
             var groups = requestedGroupIds.Count == 0

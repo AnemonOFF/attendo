@@ -1,8 +1,8 @@
 using System.Threading;
 using System.Threading.Tasks;
-using MediatR;
 using Attendo.Application.Groups.Commands;
 using Attendo.Application.Interfaces;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 namespace Attendo.Persistence.Groups.Handlers
@@ -15,7 +15,11 @@ namespace Attendo.Persistence.Groups.Handlers
         public async Task<bool> Handle(DeleteGroupCommand request, CancellationToken ct)
         {
             var entity = await _db.Groups.FirstOrDefaultAsync(x => x.Id == request.Id, ct);
-            if (entity is null) return false;
+            if (entity is null)
+            {
+                return false;
+            }
+
             _db.Groups.Remove(entity);
             await _db.SaveChangesAsync(ct);
             return true;

@@ -1,6 +1,6 @@
-using MediatR;
 using Attendo.Application.DTOs.Classes;
 using Attendo.Application.DTOs.Groups;
+using MediatR;
 
 namespace Attendo.Application.Classes.Commands.CreateClass
 {

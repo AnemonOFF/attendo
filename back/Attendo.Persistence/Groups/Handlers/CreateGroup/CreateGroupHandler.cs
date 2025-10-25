@@ -1,11 +1,11 @@
 using System.Threading;
 using System.Threading.Tasks;
-using MediatR;
 using Attendo.Application.DTOs;
+using Attendo.Application.DTOs.Groups;
 using Attendo.Application.Groups.Commands;
 using Attendo.Application.Interfaces;
 using Attendo.Domain.Entities;
-using Attendo.Application.DTOs.Groups;
+using MediatR;
 
 namespace Attendo.Persistence.Groups.Handlers
 {

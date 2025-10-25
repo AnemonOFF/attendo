@@ -1,10 +1,10 @@
 // GetClassesHandler.cs
-using MediatR;
-using Microsoft.EntityFrameworkCore;
 using Attendo.Application.Classes.Queries;
 using Attendo.Application.DTOs.Classes;
 using Attendo.Application.DTOs.Groups;
 using Attendo.Application.Interfaces;
+using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 namespace Attendo.Persistence.Classes.Handlers.GetClasses
 {

@@ -1,11 +1,11 @@
-using MediatR;
 using Attendo.Application.DTOs;
+using MediatR;
 
 namespace Attendo.Application.Groups.Queries
 {
-    using MediatR;
     using Attendo.Application.DTOs;
     using Attendo.Application.DTOs.Groups;
+    using MediatR;
 
     public class GetGroupByIdQuery : IRequest<GroupDto?>
     {

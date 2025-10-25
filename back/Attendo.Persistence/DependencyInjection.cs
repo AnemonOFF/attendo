@@ -1,8 +1,8 @@
+using Attendo.Application.Interfaces;
+using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.EntityFrameworkCore;
-using MediatR;
-using Attendo.Application.Interfaces;
 
 namespace Attendo.Persistence
 {

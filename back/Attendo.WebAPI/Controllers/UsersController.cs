@@ -1,11 +1,11 @@
-using Microsoft.AspNetCore.Mvc;
-using MediatR;
+using Attendo.Application.DTOs.Users;
 using Attendo.Application.Users.Commands.CreateUser;
-using Attendo.Application.Users.Commands.UpdateUser;
 using Attendo.Application.Users.Commands.DeleteUser;
+using Attendo.Application.Users.Commands.UpdateUser;
 using Attendo.Application.Users.Queries.GetUserById;
 using Attendo.Application.Users.Queries.GetUsers;
-using Attendo.Application.DTOs.Users;
+using MediatR;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Attendo.WebAPI.Controllers
 {
