@@ -2,5 +2,6 @@ namespace Attendo.Application.DTOs.Groups;
 
 public class GroupsListResponse
 {
-    public IList<GroupResponse> Items { get; set; } = new List<GroupResponse>();
+    public int Total { get; set; }
+    public List<GroupResponse> Items { get; set; } = new();
 }

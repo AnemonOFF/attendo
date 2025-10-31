@@ -2,12 +2,14 @@ using Attendo.Application.DTOs.Students;
 using Attendo.Application.Students.Commands;
 using Attendo.Application.Students.Queries;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Attendo.WebAPI.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("students")]
+    [Authorize]
     public class StudentsController : ControllerBase
     {
         private readonly IMediator _mediator;

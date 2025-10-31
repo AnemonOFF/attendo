@@ -1,12 +1,11 @@
 using Attendo.Application.DTOs.Groups;
 using MediatR;
 
-namespace Attendo.Application.Groups.Commands
+namespace Attendo.Application.Groups.Commands.UpdateGroup;
+
+public sealed class UpdateGroupCommand : IRequest<GroupResponse>
 {
-    public class UpdateGroupCommand : IRequest<GroupDto>
-    {
-        public int Id { get; set; }
-        public string? Title { get; set; }
-        public List<int>? Students { get; set; }
-    }
+    public int Id { get; set; }
+    public string? Title { get; set; }
+    public List<int>? Students { get; set; }
 }

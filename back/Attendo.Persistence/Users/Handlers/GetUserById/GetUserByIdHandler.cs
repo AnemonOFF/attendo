@@ -24,7 +24,6 @@ namespace Attendo.Persistence.Users.Handlers.GetUserById
                 Id = entity.Id,
                 Login = entity.Login,
                 Email = entity.Email,
-                Role = entity.Role,
                 CreatedAt = entity.CreatedAt
             };
         }

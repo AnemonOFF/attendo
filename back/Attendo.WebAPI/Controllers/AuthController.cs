@@ -42,12 +42,11 @@ public class AuthController : ControllerBase
         {
             Login = req.Login.Trim(),
             Email = req.Email.Trim(),
-            Role = string.IsNullOrWhiteSpace(req.Role) ? "User" : req.Role.Trim(),
             PasswordHash = _hasher.Hash(req.Password)
         };
 
         await _users.AddAsync(user, ct);
-        return Ok(new { user.Id, user.Login, user.Email, user.Role });
+        return Ok(new { user.Id, user.Login, user.Email });
     }
 
     [AllowAnonymous]
@@ -73,13 +72,13 @@ public class AuthController : ControllerBase
     [HttpGet("me")]
     public async Task<ActionResult<AuthUserResponse>> Me(CancellationToken ct)
     {
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        if (userId == null)
+        var idStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (!int.TryParse(idStr, out var userId))
         {
             return Unauthorized();
         }
 
-        var user = await _users.FindByLoginOrEmailAsync(User.Identity!.Name!, ct);
+        var user = await _users.FindByIdAsync(userId, ct);
         if (user is null)
         {
             return Unauthorized();
@@ -89,8 +88,7 @@ public class AuthController : ControllerBase
         {
             Id = user.Id,
             Login = user.Login,
-            Email = user.Email,
-            Role = user.Role
+            Email = user.Email
         });
     }
 }

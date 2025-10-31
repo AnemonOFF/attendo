@@ -1,10 +1,9 @@
 using Attendo.Application.DTOs.Classes;
 using MediatR;
 
-namespace Attendo.Application.Classes.Queries
+namespace Attendo.Application.Classes.Queries.GetClassById;
+
+public sealed class GetClassByIdQuery : IRequest<ClassResponse?>
 {
-    public class GetClassByIdQuery : IRequest<ClassDto?>
-    {
-        public int Id { get; set; }
-    }
+    public int Id { get; set; }
 }

@@ -10,7 +10,14 @@ public class UserRepository : IUserRepository
     public UserRepository(AppDbContext db) => _db = db;
 
     public Task<User?> FindByLoginOrEmailAsync(string loginOrEmail, CancellationToken ct) =>
-        _db.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Login == loginOrEmail || u.Email == loginOrEmail, ct);
+        _db.Users
+            .AsNoTracking()
+            .FirstOrDefaultAsync(u => u.Login == loginOrEmail || u.Email == loginOrEmail, ct);
+
+    public Task<User?> FindByIdAsync(int id, CancellationToken ct) =>
+        _db.Users
+            .AsNoTracking()
+            .FirstOrDefaultAsync(u => u.Id == id, ct);
 
     public Task<bool> ExistsLoginAsync(string login, CancellationToken ct) =>
         _db.Users.AnyAsync(u => u.Login == login, ct);

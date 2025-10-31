@@ -1,23 +1,40 @@
-using System.Threading;
-using System.Threading.Tasks;
-using Attendo.Application.DTOs;
 using Attendo.Application.DTOs.Groups;
-using Attendo.Application.Groups.Queries;
+using Attendo.Application.DTOs.Students;
+using Attendo.Application.Groups.Queries.GetGroupById;
 using Attendo.Application.Interfaces;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace Attendo.Persistence.Groups.Handlers
+namespace Attendo.Persistence.Groups.Handlers.GetGroupById
 {
-    public class GetGroupByIdHandler : IRequestHandler<GetGroupByIdQuery, GroupDto?>
+    public class GetGroupByIdHandler : IRequestHandler<GetGroupByIdQuery, GroupResponse?>
     {
         private readonly IAppDbContext _db;
         public GetGroupByIdHandler(IAppDbContext db) => _db = db;
 
-        public async Task<GroupDto?> Handle(GetGroupByIdQuery request, CancellationToken ct)
+        public async Task<GroupResponse?> Handle(GetGroupByIdQuery request, CancellationToken ct)
         {
-            var g = await _db.Groups.AsNoTracking().FirstOrDefaultAsync(x => x.Id == request.Id, ct);
-            return g is null ? null : new GroupDto { Id = g.Id, Title = g.Title };
+            var entity = await _db.Groups
+                .AsNoTracking()
+                .Include(g => g.Students)
+                .FirstOrDefaultAsync(g => g.Id == request.Id, ct);
+
+            if (entity is null)
+            {
+                return null;
+            }
+
+            return new GroupResponse
+            {
+                Id = entity.Id,
+                Title = entity.Title,
+                Students = [.. entity.Students
+                    .Select(s => new StudentDto
+                    {
+                        Id = s.Id,
+                        FullName = s.FullName
+                    })]
+            };
         }
     }
 }
