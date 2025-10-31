@@ -1,13 +1,16 @@
-using Attendo.Application.DTOs.Groups;
+namespace Attendo.Application.DTOs.Classes;
 
-namespace Attendo.Application.DTOs.Classes
+public class UpdateClassRequest
 {
-    public class UpdateClassRequest
-    {
-        public int Id { get; set; }
-        public DateTimeOffset Start { get; set; }
-        public DateTimeOffset? End { get; set; }
+    public string? Name { get; set; }
 
-        public List<GroupDto> Groups { get; set; } = new();
-    }
+    public DateOnly? Start { get; set; }
+    public DateOnly? End { get; set; }
+
+    public string? Frequency { get; set; }
+
+    public TimeOnly? StartTime { get; set; }
+    public TimeOnly? EndTime { get; set; }
+
+    public int? GroupId { get; set; }
 }

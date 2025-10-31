@@ -1,83 +1,119 @@
 using Attendo.Application.Classes.Commands.CreateClass;
+using Attendo.Application.Classes.Commands.DeleteClass;
 using Attendo.Application.Classes.Commands.SetAttendance;
 using Attendo.Application.Classes.Commands.UpdateClass;
-using Attendo.Application.Classes.Queries;
+using Attendo.Application.Classes.Queries.GetClassAttendance;
+using Attendo.Application.Classes.Queries.GetClassById;
+using Attendo.Application.Classes.Queries.GetClasses;
 using Attendo.Application.DTOs.Classes;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Attendo.WebAPI.Controllers
+namespace Attendo.WebAPI.Controllers;
+
+[ApiController]
+[Route("classes")]
+[Authorize]
+public class ClassesController : ControllerBase
 {
-    [ApiController]
-    [Route("classes")]
-    public class ClassesController : ControllerBase
+    private readonly IMediator _mediator;
+    public ClassesController(IMediator mediator) => _mediator = mediator;
+
+    [HttpGet]
+    [ProducesResponseType(typeof(ClassesListResponse), 200)]
+    public async Task<ActionResult<ClassesListResponse>> GetAll(
+        [FromQuery] DateTime? from,
+        [FromQuery] DateTime? to,
+        [FromQuery] List<int>? group,
+        CancellationToken ct)
     {
-        private readonly IMediator _mediator;
-        public ClassesController(IMediator mediator) => _mediator = mediator;
+        from ??= DateTime.MinValue;
+        to ??= DateTime.MaxValue;
 
-        [HttpGet]
-        public async Task<ActionResult<ClassesListResponse>> GetAll(CancellationToken ct)
+        var result = await _mediator.Send(new GetClassesQuery
         {
-            var result = await _mediator.Send(new GetClassesQuery(), ct);
-            return Ok(result);
-        }
+            From = from,
+            To = to,
+            Group = group
+        }, ct);
 
-        [HttpGet("{id:int}")]
-        public async Task<ActionResult<ClassDto>> GetById(int id, CancellationToken ct)
-        {
-            var result = await _mediator.Send(new GetClassByIdQuery { Id = id }, ct);
-            if (result is null)
-            {
-                return NotFound();
-            }
+        return Ok(result);
+    }
 
-            return Ok(result);
-        }
+    [HttpGet("{id:int}")]
+    [ProducesResponseType(typeof(ClassResponse), 200)]
+    [ProducesResponseType(404)]
+    public async Task<ActionResult<ClassResponse>> GetById(int id, CancellationToken ct)
+    {
+        var result = await _mediator.Send(new GetClassByIdQuery { Id = id }, ct);
+        return result is null ? NotFound() : Ok(result);
+    }
 
-        [HttpPost]
-        public async Task<ActionResult<ClassDto>> Create([FromBody] CreateClassCommand command, CancellationToken ct)
-        {
-            var result = await _mediator.Send(command, ct);
-            return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
-        }
+    [HttpPost]
+    [ProducesResponseType(typeof(ClassResponse), 200)]
+    public async Task<ActionResult<ClassResponse>> Create(
+        [FromBody] CreateClassRequest body,
+        CancellationToken ct)
+    {
+        var created = await _mediator.Send(
+            new CreateClassCommand(
+                body.Name,
+                body.Start,
+                body.End,
+                body.Frequency,
+                body.StartTime,
+                body.EndTime,
+                body.GroupId
+            ), ct);
 
-        [HttpPut("{id:int}")]
-        public async Task<ActionResult<ClassDto>> Update(int id, [FromBody] UpdateClassCommand command, CancellationToken ct)
-        {
-            if (id != command.Id)
-            {
-                return BadRequest("ID in URL and body do not match.");
-            }
+        return Ok(created);
+    }
 
-            var result = await _mediator.Send(command, ct);
-            if (result is null)
-            {
-                return NotFound();
-            }
+    [HttpPut("{id:int}")]
+    [ProducesResponseType(typeof(ClassResponse), 200)]
+    public async Task<ActionResult<ClassResponse>> Update(
+        int id,
+        [FromBody] UpdateClassRequest? body,
+        CancellationToken ct)
+    {
+        var updated = await _mediator.Send(
+            new UpdateClassCommand(
+                id,
+                body?.Name,
+                body?.Start,
+                body?.End,
+                body?.Frequency,
+                body?.StartTime,
+                body?.EndTime,
+                body?.GroupId
+            ), ct);
 
-            return Ok(result);
-        }
+        return Ok(updated);
+    }
 
-        [HttpPut("{id:int}/attendance")]
-        public async Task<ActionResult<ClassResponse>> SetAttendance(
-            int id,
-            [FromBody] UpdateAttendanceRequest request,
-            CancellationToken ct)
-        {
-            try
-            {
-                var result = await _mediator.Send(new SetClassAttendanceCommand
-                {
-                    ClassId = id,
-                    StudentIds = request.StudentIds
-                }, ct);
+    [HttpDelete("{id:int}")]
+    [ProducesResponseType(204)]
+    [ProducesResponseType(404)]
+    public async Task<IActionResult> Delete(int id, CancellationToken ct)
+    {
+        var ok = await _mediator.Send(new DeleteClassCommand { Id = id }, ct);
+        return ok ? NoContent() : NotFound();
+    }
 
-                return Ok(result);
-            }
-            catch (KeyNotFoundException)
-            {
-                return NotFound();
-            }
-        }
+    [HttpGet("{id:int}/attendance")]
+    [ProducesResponseType(typeof(ClassAttendanceResponse), 200)]
+    public async Task<ActionResult<ClassAttendanceResponse>> GetAttendance(int id, CancellationToken ct)
+    {
+        var attendance = await _mediator.Send(new GetClassAttendanceQuery { ClassId = id }, ct);
+        return Ok(attendance);
+    }
+
+    [HttpPut("{id:int}/attendance")]
+    [ProducesResponseType(typeof(ClassResponse), 200)]
+    public async Task<ActionResult<ClassResponse>> SetAttendance(int id, [FromBody] UpdateAttendanceRequest body, CancellationToken ct)
+    {
+        var result = await _mediator.Send(new SetClassAttendanceCommand(id, body.Attendance), ct);
+        return Ok(result);
     }
 }

@@ -20,7 +20,6 @@ namespace Attendo.Persistence.Users.Handlers.GetUsers
                     Id = u.Id,
                     Login = u.Login,
                     Email = u.Email,
-                    Role = u.Role,
                     CreatedAt = u.CreatedAt
                 })
                 .ToListAsync(ct);

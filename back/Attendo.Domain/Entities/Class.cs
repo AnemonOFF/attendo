@@ -1,13 +1,17 @@
+namespace Attendo.Domain.Entities;
 
-namespace Attendo.Domain.Entities
+public class Class
 {
-    public class Class
-    {
-        public int Id { get; set; }
-        public DateTimeOffset Start { get; set; }
-        public DateTimeOffset? End { get; set; }
-        public ICollection<Group> Groups { get; set; } = new List<Group>();
+    public int Id { get; set; }
+    public string Name { get; set; } = default!;
+    public DateOnly Start { get; set; }
+    public DateOnly End { get; set; }
+    public string Frequency { get; set; } = default!;
+    public TimeOnly StartTime { get; set; }
+    public TimeOnly EndTime { get; set; }
 
-        public ICollection<Student> Attendance { get; set; } = new List<Student>();
-    }
+    public int GroupId { get; set; }
+    public Group Group { get; set; } = null!;
+
+    public ICollection<ClassAttendance> Attendance { get; set; } = new List<ClassAttendance>();
 }

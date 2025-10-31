@@ -1,6 +1,6 @@
 namespace Attendo.Application.DTOs.Classes;
 
-public class UpdateAttendanceRequest
+public class ClassAttendanceResponse
 {
     public List<AttendanceItem> Attendance { get; set; } = new();
 }

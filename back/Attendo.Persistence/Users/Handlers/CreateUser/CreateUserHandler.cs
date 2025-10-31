@@ -26,7 +26,6 @@ namespace Attendo.Persistence.Users.Handlers.CreateUser
             {
                 Login = request.Login,
                 Email = request.Email,
-                Role = request.Role,
                 PasswordHash = HashPassword(request.Password),
                 CreatedAt = DateTimeOffset.UtcNow
             };
@@ -39,7 +38,6 @@ namespace Attendo.Persistence.Users.Handlers.CreateUser
                 Id = entity.Id,
                 Login = entity.Login,
                 Email = entity.Email,
-                Role = entity.Role,
                 CreatedAt = entity.CreatedAt
             };
         }

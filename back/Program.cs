@@ -91,7 +91,6 @@ builder.Services.AddMediatR(cfg =>
 
 var app = builder.Build();
 
-// Apply database migrations on startup
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();

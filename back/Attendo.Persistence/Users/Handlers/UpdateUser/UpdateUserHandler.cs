@@ -22,7 +22,6 @@ namespace Attendo.Persistence.Users.Handlers.UpdateUser
             }
 
             entity.Email = request.Email;
-            entity.Role = request.Role;
 
             if (!string.IsNullOrWhiteSpace(request.NewPassword))
             {
@@ -36,7 +35,6 @@ namespace Attendo.Persistence.Users.Handlers.UpdateUser
                 Id = entity.Id,
                 Login = entity.Login,
                 Email = entity.Email,
-                Role = entity.Role,
                 CreatedAt = entity.CreatedAt
             };
         }

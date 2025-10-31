@@ -1,14 +1,9 @@
-using Attendo.Application.DTOs;
+using Attendo.Application.DTOs.Groups;
 using MediatR;
 
-namespace Attendo.Application.Groups.Queries
-{
-    using Attendo.Application.DTOs;
-    using Attendo.Application.DTOs.Groups;
-    using MediatR;
+namespace Attendo.Application.Groups.Queries.GetGroupById;
 
-    public class GetGroupByIdQuery : IRequest<GroupDto?>
-    {
-        public int Id { get; set; }
-    }
+public sealed class GetGroupByIdQuery : IRequest<GroupResponse?>
+{
+    public int Id { get; set; }
 }
