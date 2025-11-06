@@ -1,5 +1,6 @@
-import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
-import React, { useState, useMemo } from "react";
+import { ChevronLeft, ChevronRight, Plus, ChevronDown, Pencil } from "lucide-react";
+import React, { useState, useMemo, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 
 // TypeScript Interfaces
 interface Group {
@@ -225,6 +226,126 @@ const mockClasses: Class[] = [
   },
 ];
 
+const GroupDropdown = ({
+  selectedGroupId,
+  setSelectedGroupId,
+  onEditGroup,
+}: {
+  selectedGroupId: string;
+  setSelectedGroupId: (id: string) => void;
+  onEditGroup: (id: string) => void;
+}) => {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (ref.current && !ref.current.contains(event.target as Node)) setOpen(false);
+    };
+    if (open) document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [open]);
+  const selectedGroup =
+    selectedGroupId === "all"
+      ? { id: "all", name: "All Groups" }
+      : mockGroups.find((g) => g.id === selectedGroupId);
+  return (
+    <div ref={ref} style={{ position: "relative", minWidth: 160 }}>
+      <button
+        style={{
+          width: "100%",
+          padding: "0.625rem 1rem",
+          borderRadius: "0.5rem",
+          border: "1px solid #E5E7EB",
+          fontSize: "0.875rem",
+          color: "#111827",
+          background: "#FFF",
+          cursor: "pointer",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+        }}
+        onClick={() => setOpen((curr) => !curr)}
+      >
+        <span>{selectedGroup?.name || ""}</span>
+        <ChevronDown size={18} style={{ transform: open ? "rotate(180deg)" : "" }} />
+      </button>
+      {open && (
+        <div
+          style={{
+            position: "absolute",
+            top: "110%",
+            left: 0,
+            width: "100%",
+            background: "#FFF",
+            border: "1px solid #E5E7EB",
+            borderRadius: "0.5rem",
+            boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+            zIndex: 10,
+            marginTop: 4,
+          }}
+        >
+          <div
+            style={{
+              padding: "0.5rem 1rem",
+              cursor: "pointer",
+              color: "#111827",
+              borderRadius: "0.5rem 0.5rem 0 0",
+              borderBottom: "1px solid #F1F1F1",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+            }}
+            onClick={() => {
+              setSelectedGroupId("all");
+              setOpen(false);
+            }}
+          >
+            All Groups
+          </div>
+          {mockGroups.map((group, i) => (
+            <div
+              key={group.id}
+              style={{
+                padding: "0.5rem 1rem",
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                backgroundColor: selectedGroupId === group.id ? "#EEF2FF" : "#FFF",
+                borderBottom:
+                  i === mockGroups.length - 1 ? "none" : "1px solid #F1F1F1",
+              }}
+              onClick={() => {
+                setSelectedGroupId(group.id);
+                setOpen(false);
+              }}
+            >
+              <span style={{color: 'black', textAlign: 'left'}}>{group.name}</span>
+              <Pencil
+                size={16}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setOpen(false);
+                  onEditGroup(group.id);
+                }}
+                style={{
+                  color: "#6366F1",
+                  marginLeft: 10,
+                  cursor: "pointer",
+                  verticalAlign: "middle",
+                }}
+                //title="Edit Group"
+              />
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+
+
 const AttendanceCalendar: React.FC = () => {
   // State Management
   const [currentWeekStart, setCurrentWeekStart] = useState<Date>(() => {
@@ -236,8 +357,8 @@ const AttendanceCalendar: React.FC = () => {
     monday.setHours(0, 0, 0, 0);
     return monday;
   });
-
   const [selectedGroupId, setSelectedGroupId] = useState<string>("all");
+  const navigate = useNavigate();
 
   // Constants
   const DAYS = [
@@ -282,7 +403,13 @@ const AttendanceCalendar: React.FC = () => {
 
   const handleAddClass = () => {
     console.warn("Navigate to Add Class screen");
+    navigate('/addClass');
     // Navigation logic would go here
+  };
+  
+  const handleClassInfo = (classInfo: Class): void => {
+    console.warn("Navigate to Class Info screen");
+    navigate('/classInfo', {state: classInfo});
   };
 
   // Filter classes by selected group
@@ -350,38 +477,12 @@ const AttendanceCalendar: React.FC = () => {
           }}
         >
           {/* Left Section - Group Selection */}
-          <div
-            style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}
-          >
-            <select
-              value={selectedGroupId}
-              onChange={(e) => setSelectedGroupId(e.target.value)}
-              style={{
-                padding: "0.625rem 1rem",
-                borderRadius: "0.5rem",
-                border: `1px solid ${colors.border}`,
-                fontSize: "0.875rem",
-                color: colors.text.primary,
-                backgroundColor: colors.white,
-                cursor: "pointer",
-                outline: "none",
-                transition: "all 0.2s",
-              }}
-              onMouseEnter={(e) =>
-                (e.currentTarget.style.borderColor = colors.primary)
-              }
-              onMouseLeave={(e) =>
-                (e.currentTarget.style.borderColor = colors.border)
-              }
-            >
-              <option value="all">All Groups</option>
-              {mockGroups.map((group) => (
-                <option key={group.id} value={group.id}>
-                  {group.name}
-                </option>
-              ))}
-            </select>
-
+          <div style={{display: 'flex', gap: '10px'}}>
+            <GroupDropdown
+              selectedGroupId={selectedGroupId}
+              setSelectedGroupId={setSelectedGroupId}
+              onEditGroup={() => {}}
+            />
             <button
               onClick={handleAddGroup}
               style={{
@@ -640,6 +741,7 @@ const AttendanceCalendar: React.FC = () => {
                                 "0 2px 4px rgba(0, 0, 0, 0.1)";
                               e.currentTarget.style.zIndex = "1";
                             }}
+                            onClick={() => handleClassInfo(cls)}
                           >
                             <div
                               style={{

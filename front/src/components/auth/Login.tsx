@@ -92,7 +92,7 @@ const Login: React.FC = () => {
 
       // // On successful login, navigate to dashboard
       console.warn("Login successful");
-      navigate("/dashboard"); // ← Change this to your dashboard route
+      navigate("/calendar"); // ← Change this to your dashboard route
 
       // navigate('/dashboard');
     } catch (error: unknown) {
