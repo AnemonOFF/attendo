@@ -8,6 +8,7 @@ import {
 
 import "./App.css";
 // Import auth components
+import AddClassScreen from "./components/AddClassScreen";
 import AttendanceCalendar from "./components/AttendanceCalendar";
 import Login from "./components/auth/Login";
 import RecoverPassword from "./components/auth/RecoverPassword";

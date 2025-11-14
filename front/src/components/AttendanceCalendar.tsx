@@ -1,4 +1,11 @@
-import { ChevronLeft, ChevronRight, Plus, ChevronDown, Pencil } from "lucide-react";
+/* eslint-disable sonarjs/no-duplicate-string */
+import {
+  ChevronLeft,
+  ChevronRight,
+  Plus,
+  ChevronDown,
+  Pencil,
+} from "lucide-react";
 import React, { useState, useMemo, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -239,7 +246,8 @@ const GroupDropdown = ({
   const ref = useRef<HTMLDivElement | null>(null);
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (ref.current && !ref.current.contains(event.target as Node)) setOpen(false);
+      if (ref.current && !ref.current.contains(event.target as Node))
+        setOpen(false);
     };
     if (open) document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
@@ -267,8 +275,8 @@ const GroupDropdown = ({
         onClick={() => setOpen((curr) => !curr)}
       >
         <span>{selectedGroup?.name || ""}</span>
-        <ChevronDown 
-          size={18} 
+        <ChevronDown
+          size={18}
           style={{ transform: open ? "rotate(180deg)" : "" }}
         />
       </button>
@@ -314,7 +322,8 @@ const GroupDropdown = ({
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "space-between",
-                backgroundColor: selectedGroupId === group.id ? "#EEF2FF" : "#FFF",
+                backgroundColor:
+                  selectedGroupId === group.id ? "#EEF2FF" : "#FFF",
                 borderBottom:
                   i === mockGroups.length - 1 ? "none" : "1px solid #F1F1F1",
               }}
@@ -323,7 +332,9 @@ const GroupDropdown = ({
                 setOpen(false);
               }}
             >
-              <span style={{color: 'black', textAlign: 'left'}}>{group.name}</span>
+              <span style={{ color: "black", textAlign: "left" }}>
+                {group.name}
+              </span>
               <Pencil
                 size={16}
                 onClick={(e) => {
@@ -346,8 +357,6 @@ const GroupDropdown = ({
     </div>
   );
 };
-
-
 
 const AttendanceCalendar: React.FC = () => {
   // State Management
@@ -401,23 +410,23 @@ const AttendanceCalendar: React.FC = () => {
 
   const handleEditGroup = (group: Group): void => {
     // console.warn('This is the element:', group);
-    navigate('/editGroup', {state: group});
+    navigate("/editGroup", { state: group });
   };
 
   const handleAddGroup = () => {
     console.warn("Navigate to Add Group screen");
-    navigate('/addGroup');
+    navigate("/addGroup");
   };
 
   const handleAddClass = () => {
     console.warn("Navigate to Add Class screen");
-    navigate('/addClass');
+    navigate("/addClass");
     // Navigation logic would go here
   };
-  
+
   const handleClassInfo = (classInfo: Class): void => {
     console.warn("Navigate to Class Info screen");
-    navigate('/classInfo', {state: classInfo});
+    navigate("/classInfo", { state: classInfo });
   };
 
   // Filter classes by selected group
@@ -485,11 +494,13 @@ const AttendanceCalendar: React.FC = () => {
           }}
         >
           {/* Left Section - Group Selection */}
-          <div style={{display: 'flex', gap: '10px'}}>
+          <div style={{ display: "flex", gap: "10px" }}>
             <GroupDropdown
               selectedGroupId={selectedGroupId}
               setSelectedGroupId={setSelectedGroupId}
-              onEditGroup={(group) => {handleEditGroup(group)}}
+              onEditGroup={(group) => {
+                handleEditGroup(group);
+              }}
             />
             <button
               onClick={handleAddGroup}

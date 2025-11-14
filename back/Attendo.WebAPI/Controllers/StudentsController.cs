@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Attendo.WebAPI.Controllers
 {
     [ApiController]
-    [Route("students")]
+    [Route("api/v1/students")]
     [Authorize]
     public class StudentsController : ControllerBase
     {

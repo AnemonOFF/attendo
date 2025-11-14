@@ -102,7 +102,6 @@ export default defineConfig([
       // Accessibility
       "jsx-a11y/alt-text": "warn",
       "jsx-a11y/anchor-is-valid": "warn",
-      "jsx-a11y/no-autofocus": ["warn", { ignoreNonDOM: true }],
 
       // Promises
       "promise/no-return-wrap": "warn",
