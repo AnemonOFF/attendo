@@ -15,7 +15,6 @@ import RecoverPassword from "./components/auth/RecoverPassword";
 import Register from "./components/auth/Register";
 import SplashScreen from "./components/auth/SplashScreen";
 import ClassAttendanceScreen from "./components/ClassAttendanceScreen";
-import AddClassScreen from "./components/AddClassScreen";
 import EditGroupScreen from "./components/EditGroupScreen";
 import GroupManagementDemo from "./components/GoupManagement";
 

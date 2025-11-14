@@ -1,6 +1,6 @@
 /* eslint-disable sonarjs/no-duplicate-string */
-import React, { useState } from "react";
 import { ArrowLeft, Plus, Clock } from "lucide-react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 // TypeScript Interfaces
@@ -116,7 +116,10 @@ const AddClassScreen: React.FC = () => {
     return errors;
   };
 
-  const handleInputChange = (field: keyof FormData, value: any) => {
+  const handleInputChange = (
+    field: keyof FormData,
+    value: string | number | string[] | number[],
+  ) => {
     setFormData((prev) => ({
       ...prev,
       [field]: value,
@@ -156,8 +159,6 @@ const AddClassScreen: React.FC = () => {
     try {
       // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      console.log("Form submitted:", formData);
 
       // Show success message
       setSubmitSuccess(true);

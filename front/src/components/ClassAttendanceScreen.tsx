@@ -1,5 +1,6 @@
-import React, { useState, useMemo } from "react";
+/* eslint-disable sonarjs/no-duplicate-string */
 import { ArrowLeft, ChevronLeft, ChevronRight, Download } from "lucide-react";
+import React, { useState, useMemo } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 
 // TypeScript Interfaces
@@ -116,7 +117,6 @@ const ClassAttendanceScreen: React.FC = () => {
   };
 
   const handleBackButton = () => {
-    console.log("Navigate back to calendar screen");
     navigate(-1);
   };
 
@@ -171,7 +171,7 @@ const ClassAttendanceScreen: React.FC = () => {
     );
 
     setAttendanceRecords((prev) => {
-      let updated = [...prev];
+      const updated = [...prev];
 
       filteredStudents.forEach((student) => {
         const existingIndex = updated.findIndex(
