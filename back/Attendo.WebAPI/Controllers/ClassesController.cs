@@ -13,7 +13,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Attendo.WebAPI.Controllers;
 
 [ApiController]
-[Route("classes")]
+[Route("api/v1/classes")]
 [Authorize]
 public class ClassesController : ControllerBase
 {
