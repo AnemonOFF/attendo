@@ -231,8 +231,9 @@ const Register: React.FC = () => {
       navigate("/login");
     } catch (error: unknown) {
       // Properly handle the error with type checking
+      const errorMessage = "Registration failed. Please try again.";
       if (error instanceof Error) {
-        setApiError(error.message || "Registration failed. Please try again.");
+        setApiError(error.message || errorMessage);
       } else if (
         typeof error === "object" &&
         error !== null &&
@@ -242,12 +243,9 @@ const Register: React.FC = () => {
         const axiosError = error as {
           response?: { data?: { message?: string } };
         };
-        setApiError(
-          axiosError.response?.data?.message ||
-            "Registration failed. Please try again.",
-        );
+        setApiError(axiosError.response?.data?.message || errorMessage);
       } else {
-        setApiError("Registration failed. Please try again.");
+        setApiError(errorMessage);
       }
     } finally {
       // setIsLoading(false);

@@ -187,13 +187,12 @@ const RecoverPassword: React.FC = () => {
       await new Promise((resolve) => setTimeout(resolve, 1500));
 
       setSuccess(true);
-      console.log("Password recovery email sent to:", formData.email);
 
       // Auto-redirect to login after 3 seconds
       setTimeout(() => {
         navigate("/login");
       }, 3000);
-    } catch (error) {
+    } catch {
       setErrors({
         email:
           "Failed to send recovery email. Please verify your email address and try again.",
