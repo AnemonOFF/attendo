@@ -116,7 +116,10 @@ const AddClassScreen: React.FC = () => {
     return errors;
   };
 
-  const handleInputChange = (field: keyof FormData, value: unknown) => {
+  const handleInputChange = (
+    field: keyof FormData,
+    value: string | number | string[] | number[],
+  ) => {
     setFormData((prev) => ({
       ...prev,
       [field]: value,

@@ -15,6 +15,8 @@ import RecoverPassword from "./components/auth/RecoverPassword";
 import Register from "./components/auth/Register";
 import SplashScreen from "./components/auth/SplashScreen";
 import ClassAttendanceScreen from "./components/ClassAttendanceScreen";
+import EditGroupScreen from "./components/EditGroupScreen";
+import GroupManagementDemo from "./components/GoupManagement";
 
 function App() {
   return (
@@ -29,6 +31,8 @@ function App() {
         <Route path="/calendar" element={<AttendanceCalendar />} />
         <Route path="/classInfo" element={<ClassAttendanceScreen />} />
         <Route path="/addClass" element={<AddClassScreen />} />
+        <Route path="/editGroup" element={<EditGroupScreen />} />
+        <Route path="/addGroup" element={<GroupManagementDemo />} />
       </Routes>
     </Router>
   );

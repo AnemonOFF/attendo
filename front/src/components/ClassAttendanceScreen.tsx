@@ -1,3 +1,4 @@
+/* eslint-disable sonarjs/no-duplicate-string */
 import { ArrowLeft, ChevronLeft, ChevronRight, Download } from "lucide-react";
 import React, { useState, useMemo } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -246,8 +247,6 @@ const ClassAttendanceScreen: React.FC = () => {
     document.body.removeChild(link);
   };
 
-  const boxShadow = "0 1px 3px rgba(0, 0, 0, 0.1)";
-
   return (
     <div
       style={{
@@ -278,7 +277,7 @@ const ClassAttendanceScreen: React.FC = () => {
               backgroundColor: colors.white,
               cursor: "pointer",
               transition: "all 0.2s",
-              boxShadow,
+              boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)",
             }}
             onMouseEnter={(e) =>
               (e.currentTarget.style.backgroundColor = colors.background)
@@ -318,7 +317,7 @@ const ClassAttendanceScreen: React.FC = () => {
             backgroundColor: colors.white,
             padding: "1.5rem",
             borderRadius: "1rem",
-            boxShadow,
+            boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)",
           }}
         >
           {/* Left - Group Selection */}
@@ -394,7 +393,7 @@ const ClassAttendanceScreen: React.FC = () => {
             backgroundColor: colors.white,
             borderRadius: "1rem",
             padding: "1.5rem",
-            boxShadow,
+            boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)",
             overflowX: "auto",
           }}
         >
