@@ -233,7 +233,7 @@ const GroupDropdown = ({
 }: {
   selectedGroupId: string;
   setSelectedGroupId: (id: string) => void;
-  onEditGroup: (id: string) => void;
+  onEditGroup: (group: Group) => void;
 }) => {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement | null>(null);
@@ -267,7 +267,10 @@ const GroupDropdown = ({
         onClick={() => setOpen((curr) => !curr)}
       >
         <span>{selectedGroup?.name || ""}</span>
-        <ChevronDown size={18} style={{ transform: open ? "rotate(180deg)" : "" }} />
+        <ChevronDown 
+          size={18} 
+          style={{ transform: open ? "rotate(180deg)" : "" }}
+        />
       </button>
       {open && (
         <div
@@ -326,7 +329,7 @@ const GroupDropdown = ({
                 onClick={(e) => {
                   e.stopPropagation();
                   setOpen(false);
-                  onEditGroup(group.id);
+                  onEditGroup(group);
                 }}
                 style={{
                   color: "#6366F1",
@@ -396,9 +399,14 @@ const AttendanceCalendar: React.FC = () => {
     setCurrentWeekStart(newDate);
   };
 
+  const handleEditGroup = (group: Group): void => {
+    // console.warn('This is the element:', group);
+    navigate('/editGroup', {state: group});
+  };
+
   const handleAddGroup = () => {
     console.warn("Navigate to Add Group screen");
-    // Navigation logic would go here
+    navigate('/addGroup');
   };
 
   const handleAddClass = () => {
@@ -481,7 +489,7 @@ const AttendanceCalendar: React.FC = () => {
             <GroupDropdown
               selectedGroupId={selectedGroupId}
               setSelectedGroupId={setSelectedGroupId}
-              onEditGroup={() => {}}
+              onEditGroup={(group) => {handleEditGroup(group)}}
             />
             <button
               onClick={handleAddGroup}
