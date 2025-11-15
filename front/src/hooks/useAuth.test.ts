@@ -1,9 +1,9 @@
 import { act, waitFor } from "@testing-library/react";
 import { vi } from "vitest";
 
+import { useLogin, useRegister, useMe } from "./useAuth";
 import * as authApi from "../api/authController";
 import { renderHookWithQueryClient } from "../test/testUtils";
-import { useLogin, useRegister, useMe } from "./useAuth";
 
 vi.mock("../api/authController", () => ({
   login: vi.fn(),

@@ -1,3 +1,4 @@
+/* eslint-disable sonarjs/no-duplicate-string */
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { vi } from "vitest";
@@ -8,9 +9,10 @@ const mockNavigate = vi.fn();
 const mockLocationState = { name: "Morning Yoga" };
 
 vi.mock("react-router-dom", async () => {
-  const actual = await vi.importActual<typeof import("react-router-dom")>(
-    "react-router-dom",
-  );
+  const actual =
+    await vi.importActual<typeof import("react-router-dom")>(
+      "react-router-dom",
+    );
   return {
     ...actual,
     useNavigate: () => mockNavigate,
@@ -139,4 +141,3 @@ describe("ClassAttendanceScreen", () => {
     expect(getFirstHeader()).toBe(initialHeader);
   });
 });
-

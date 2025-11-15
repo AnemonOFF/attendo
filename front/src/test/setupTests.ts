@@ -16,4 +16,3 @@ beforeAll(() => {
     window.URL.revokeObjectURL = vi.fn();
   }
 });
-

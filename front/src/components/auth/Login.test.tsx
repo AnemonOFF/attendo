@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { vi } from "vitest";
 import { MemoryRouter } from "react-router-dom";
+import { vi } from "vitest";
 
 import Login from "./Login";
 
@@ -11,9 +11,10 @@ const mockNavigate = vi.fn();
 const mockUseLogin = vi.fn();
 
 vi.mock("react-router-dom", async () => {
-  const actual = await vi.importActual<typeof import("react-router-dom")>(
-    "react-router-dom",
-  );
+  const actual =
+    await vi.importActual<typeof import("react-router-dom")>(
+      "react-router-dom",
+    );
   return {
     ...actual,
     useNavigate: () => mockNavigate,
@@ -83,4 +84,3 @@ describe("Login component", () => {
     expect(button).toBeDisabled();
   });
 });
-
