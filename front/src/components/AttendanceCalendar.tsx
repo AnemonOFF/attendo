@@ -504,6 +504,7 @@ const AttendanceCalendar: React.FC = () => {
             />
             <button
               onClick={handleAddGroup}
+              aria-label="Add group"
               style={{
                 display: "flex",
                 alignItems: "center",
@@ -535,6 +536,7 @@ const AttendanceCalendar: React.FC = () => {
           <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
             <button
               onClick={() => navigateWeek("prev")}
+              aria-label="Previous week"
               style={{
                 display: "flex",
                 alignItems: "center",
@@ -572,6 +574,7 @@ const AttendanceCalendar: React.FC = () => {
 
             <button
               onClick={() => navigateWeek("next")}
+              aria-label="Next week"
               style={{
                 display: "flex",
                 alignItems: "center",
