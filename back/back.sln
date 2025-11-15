@@ -15,6 +15,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Attendo.Shared", "Attendo.S
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Attendo.WebAPI", "Attendo.WebAPI\Attendo.WebAPI.csproj", "{8BDD3A41-26DD-4C2B-879F-606390E91E68}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Attendo.Tests", "Attendo.Tests\Attendo.Tests.csproj", "{C9BB1516-6F24-4322-B20C-379785428048}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -97,6 +99,18 @@ Global
 		{8BDD3A41-26DD-4C2B-879F-606390E91E68}.Release|x64.Build.0 = Release|Any CPU
 		{8BDD3A41-26DD-4C2B-879F-606390E91E68}.Release|x86.ActiveCfg = Release|Any CPU
 		{8BDD3A41-26DD-4C2B-879F-606390E91E68}.Release|x86.Build.0 = Release|Any CPU
+		{C9BB1516-6F24-4322-B20C-379785428048}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C9BB1516-6F24-4322-B20C-379785428048}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C9BB1516-6F24-4322-B20C-379785428048}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{C9BB1516-6F24-4322-B20C-379785428048}.Debug|x64.Build.0 = Debug|Any CPU
+		{C9BB1516-6F24-4322-B20C-379785428048}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{C9BB1516-6F24-4322-B20C-379785428048}.Debug|x86.Build.0 = Debug|Any CPU
+		{C9BB1516-6F24-4322-B20C-379785428048}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C9BB1516-6F24-4322-B20C-379785428048}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C9BB1516-6F24-4322-B20C-379785428048}.Release|x64.ActiveCfg = Release|Any CPU
+		{C9BB1516-6F24-4322-B20C-379785428048}.Release|x64.Build.0 = Release|Any CPU
+		{C9BB1516-6F24-4322-B20C-379785428048}.Release|x86.ActiveCfg = Release|Any CPU
+		{C9BB1516-6F24-4322-B20C-379785428048}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

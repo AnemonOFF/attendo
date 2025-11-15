@@ -122,4 +122,16 @@ export default defineConfig([
       "prettier/prettier": "warn",
     },
   },
+  {
+    files: ["**/*.test.{ts,tsx}", "**/__tests__/**/*.{ts,tsx}"],
+    rules: {
+      "@typescript-eslint/consistent-type-imports": [
+        "error",
+        {
+          prefer: "type-imports",
+          disallowTypeAnnotations: false,
+        },
+      ],
+    },
+  },
 ]);

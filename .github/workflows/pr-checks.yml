@@ -43,6 +43,10 @@ jobs:
         working-directory: ./front
         run: npm run build
 
+      - name: Frontend unit tests
+        working-directory: ./front
+        run: npm run test:coverage
+
       - name: Backend restore
         working-directory: ./back
         run: dotnet restore
@@ -51,10 +55,22 @@ jobs:
         working-directory: ./back
         run: dotnet build --configuration Release --no-restore
 
-      - name: Backend test
+      - name: Backend tests
         working-directory: ./back
-        run: dotnet test --configuration Release --no-build --verbosity normal
-        continue-on-error: true
+        run: |
+          dotnet test back.sln \
+            --configuration Release \
+            --no-build \
+            --logger "trx;LogFileName=backend-tests.trx" \
+            --results-directory ./TestResults
+
+      - name: Upload backend test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pr-backend-test-results
+          path: back/TestResults/
+          retention-days: 7
 
       - name: Check for TODO/FIXME comments
         run: |
@@ -75,4 +91,5 @@ jobs:
           echo "- ✅ Frontend type checking passed" >> $GITHUB_STEP_SUMMARY
           echo "- ✅ Frontend build successful" >> $GITHUB_STEP_SUMMARY
           echo "- ✅ Backend build successful" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Backend tests passed" >> $GITHUB_STEP_SUMMARY
           echo "- ✅ All checks completed" >> $GITHUB_STEP_SUMMARY
