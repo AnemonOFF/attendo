@@ -34,6 +34,10 @@ jobs:
         working-directory: ./front
         run: npx tsc --noEmit
 
+      - name: Run frontend unit tests
+        working-directory: ./front
+        run: npm run test:coverage
+
       - name: Build frontend
         working-directory: ./front
         run: npm run build
