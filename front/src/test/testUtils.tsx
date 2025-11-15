@@ -9,7 +9,6 @@ export const createTestQueryClient = () =>
     defaultOptions: {
       queries: {
         retry: false,
-        cacheTime: 0,
         gcTime: 0,
       },
       mutations: {
