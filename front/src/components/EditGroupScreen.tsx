@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { ArrowLeft, Plus, Trash2 } from 'lucide-react';
+import { ArrowLeft, Plus, Trash2, X } from 'lucide-react';
 import { useNavigate, useLocation } from "react-router-dom";
 
 // TypeScript Interfaces
@@ -31,6 +31,13 @@ const EditGroupScreen: React.FC = () => {
   // State Management
   const [students, setStudents] = useState<Student[]>(mockStudents);
   const [swipeState, setSwipeState] = useState<SwipeState | null>(null);
+  
+  // Add Student Modal State
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [newStudentName, setNewStudentName] = useState('');
+  const [newStudentEmail, setNewStudentEmail] = useState('');
+
+  // Delete Confirmation State
   const [deleteConfirmation, setDeleteConfirmation] = useState<{ show: boolean; studentId: string; studentName: string }>({
     show: false,
     studentId: '',
@@ -41,9 +48,9 @@ const EditGroupScreen: React.FC = () => {
 
   const navigate = useNavigate();
   const location = useLocation();
-  const { state } = location;
+  const state = location.state || { name: 'Group Name' }; // Fallback if state is missing
 
-  // Theme colors (matching previous screens)
+  // Theme colors
   const colors = {
     primary: '#6366F1',
     primaryHover: '#4F46E5',
@@ -64,13 +71,35 @@ const EditGroupScreen: React.FC = () => {
   // Navigation handlers
   const handleBackButton = () => {
     navigate(-1);
-    // Navigation logic would go here
   };
 
+  // --- ADD STUDENT LOGIC ---
   const handleAddStudent = () => {
-    console.log('Navigate to Add Student screen');
-    // Navigation logic would go here
+    setShowAddModal(true);
   };
+
+  const handleCloseAddModal = () => {
+    setShowAddModal(false);
+    setNewStudentName('');
+    setNewStudentEmail('');
+  };
+
+  const handleSaveNewStudent = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newStudentName.trim() || !newStudentEmail.trim()) return;
+
+    const newStudent: Student = {
+      id: Date.now().toString(), // Simple ID generation
+      name: newStudentName,
+      email: newStudentEmail,
+      groupId: state.id || '1',
+      joinDate: new Date().toISOString()
+    };
+
+    setStudents([...students, newStudent]);
+    handleCloseAddModal();
+  };
+  // -------------------------
 
   // Swipe gesture handling
   const handleTouchStart = (e: React.TouchEvent, studentId: string) => {
@@ -113,25 +142,6 @@ const EditGroupScreen: React.FC = () => {
     }
   };
 
-/*   const handleMouseMove = (e: React.MouseEvent) => {
-    if (!swipeState || !swipeState.isDragging) return;
-    
-    e.preventDefault();
-    const deltaX = e.clientX - swipeState.startX;
-    const maxOffset = -80;
-    const offset = Math.max(maxOffset, Math.min(0, deltaX));
-    
-    setSwipeState({
-      ...swipeState,
-      offset
-    });
-
-    const element = swipeRefs.current[swipeState.studentId];
-    if (element) {
-      element.style.transform = `translateX(${offset}px)`;
-    }
-  }; */
-
   const handleTouchEnd = () => {
     if (!swipeState) return;
     
@@ -147,21 +157,6 @@ const EditGroupScreen: React.FC = () => {
     
     setSwipeState(null);
   };
-
-  /* const handleMouseUp = () => {
-    if (!swipeState) return;
-    
-    const element = swipeRefs.current[swipeState.studentId];
-    if (element) {
-      if (swipeState.offset < -40) {
-        element.style.transform = 'translateX(-80px)';
-      } else {
-        element.style.transform = 'translateX(0px)';
-      }
-    }
-    
-    setSwipeState(null);
-  }; */
 
   // Global mouse/touch event listeners
   useEffect(() => {
@@ -503,7 +498,186 @@ const EditGroupScreen: React.FC = () => {
           )}
         </div>
 
-        {/* Confirmation Dialog */}
+        {/* ADD STUDENT MODAL */}
+        {showAddModal && (
+          <div style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1000,
+            padding: '1rem',
+          }}>
+            <div style={{
+              backgroundColor: colors.white,
+              borderRadius: '1rem',
+              padding: '2rem',
+              maxWidth: '450px',
+              width: '100%',
+              boxShadow: '0 10px 25px rgba(0, 0, 0, 0.2)',
+              position: 'relative',
+            }}>
+              {/* Modal Header */}
+              <div style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginBottom: '1.5rem',
+              }}>
+                <h3 style={{
+                  fontSize: '1.25rem',
+                  fontWeight: '600',
+                  color: colors.text.primary,
+                  margin: 0,
+                }}>
+                  Add New Student
+                </h3>
+                <button
+                  onClick={handleCloseAddModal}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    cursor: 'pointer',
+                    color: colors.text.light,
+                    padding: '0.25rem',
+                  }}
+                >
+                  <X size={20} />
+                </button>
+              </div>
+
+              {/* Form */}
+              <form onSubmit={handleSaveNewStudent}>
+                <div style={{ marginBottom: '1rem' }}>
+                  <label style={{
+                    display: 'block',
+                    fontSize: '0.875rem',
+                    fontWeight: '500',
+                    color: colors.text.secondary,
+                    marginBottom: '0.5rem',
+                  }}>
+                    Full Name
+                  </label>
+                  <input
+                    type="text"
+                    value={newStudentName}
+                    onChange={(e) => setNewStudentName(e.target.value)}
+                    placeholder="e.g. Jane Doe"
+                    style={{
+                      width: '100%',
+                      padding: '0.75rem',
+                      borderRadius: '0.5rem',
+                      border: `1px solid ${colors.border}`,
+                      fontSize: '0.875rem',
+                      outline: 'none',
+                      boxSizing: 'border-box',
+                      backgroundColor: colors.background,
+                      color: colors.text.primary,
+                    }}
+                    onFocus={(e) => {
+                        e.target.style.borderColor = colors.primary;
+                        e.target.style.boxShadow = `0 0 0 3px ${colors.primary}40`;
+                    }}
+                    onBlur={(e) => {
+                        e.target.style.borderColor = state.validationError ? colors.danger : '#E5E7EB';
+                        e.target.style.boxShadow = 'none';
+                    }}
+                  />
+                </div>
+
+                <div style={{ marginBottom: '2rem' }}>
+                  <label style={{
+                    display: 'block',
+                    fontSize: '0.875rem',
+                    fontWeight: '500',
+                    color: colors.text.secondary,
+                    marginBottom: '0.5rem',
+                  }}>
+                    Email Address
+                  </label>
+                  <input
+                    type="email"
+                    value={newStudentEmail}
+                    onChange={(e) => setNewStudentEmail(e.target.value)}
+                    placeholder="e.g. jane@example.com"
+                    style={{
+                      width: '100%',
+                      padding: '0.75rem',
+                      borderRadius: '0.5rem',
+                      border: `1px solid ${colors.border}`,
+                      fontSize: '0.875rem',
+                      outline: 'none',
+                      boxSizing: 'border-box',
+                      backgroundColor: colors.background,
+                      color: colors.text.primary,
+                    }}
+                    onFocus={(e) => {
+                        e.target.style.borderColor = colors.primary;
+                        e.target.style.boxShadow = `0 0 0 3px ${colors.primary}40`;
+                    }}
+                    onBlur={(e) => {
+                        e.target.style.borderColor = state.validationError ? colors.danger : '#E5E7EB';
+                        e.target.style.boxShadow = 'none';
+                    }}
+                  />
+                </div>
+
+                <div style={{
+                  display: 'flex',
+                  gap: '0.75rem',
+                  justifyContent: 'flex-end',
+                }}>
+                  <button
+                    type="button"
+                    onClick={handleCloseAddModal}
+                    style={{
+                      padding: '0.75rem 1.5rem',
+                      borderRadius: '0.5rem',
+                      border: `1px solid ${colors.border}`,
+                      backgroundColor: colors.white,
+                      color: colors.text.primary,
+                      fontSize: '0.875rem',
+                      fontWeight: '500',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s',
+                    }}
+                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = colors.background}
+                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = colors.white}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    style={{
+                      padding: '0.75rem 1.5rem',
+                      borderRadius: '0.5rem',
+                      border: 'none',
+                      backgroundColor: colors.primary,
+                      color: colors.white,
+                      fontSize: '0.875rem',
+                      fontWeight: '500',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s',
+                      opacity: (!newStudentName || !newStudentEmail) ? 0.6 : 1,
+                    }}
+                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = colors.primaryHover}
+                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = colors.primary}
+                    disabled={!newStudentName || !newStudentEmail}
+                  >
+                    Add Student
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* Delete Confirmation Dialog */}
         {deleteConfirmation.show && (
           <div style={{
             position: 'fixed',

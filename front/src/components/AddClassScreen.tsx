@@ -1,12 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { getGroups } from '../api/groupController';
+import { createClass } from '../api/classController';
 import { ArrowLeft, Plus, Clock } from 'lucide-react';
 import { useNavigate } from "react-router-dom";
 
 // TypeScript Interfaces
 interface Group {
-  id: string;
-  name: string;
-  color: string;
+  id: number;
+  title: string;
+  students: any[];
 }
 
 interface FormData {
@@ -26,14 +28,7 @@ interface ValidationErrors {
   duration?: string;
 }
 
-// Mock Data (matching previous screens)
-const mockGroups: Group[] = [
-  { id: '1', name: 'Yoga Basics', color: '#10B981' },
-  { id: '2', name: 'Advanced Fitness', color: '#3B82F6' },
-  { id: '3', name: 'Dance Classes', color: '#F59E0B' },
-  { id: '4', name: 'Martial Arts', color: '#EF4444' },
-  { id: '5', name: 'Pilates', color: '#8B5CF6' },
-];
+
 
 const AddClassScreen: React.FC = () => {
   // State Management
@@ -49,7 +44,28 @@ const AddClassScreen: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [focusedField, setFocusedField] = useState<string>('');
+  const [groups, setGroups] = useState<Group[]>([]);
+  const [groupsLoading, setGroupsLoading] = useState(false);
+  const [groupsError, setGroupsError] = useState<string | null>(null);
+  const [apiError, setApiError] = useState<string | null>(null);
   const navigate = useNavigate();
+
+  // Fetch groups from API on mount
+  useEffect(() => {
+    const fetchGroups = async () => {
+      setGroupsLoading(true);
+      setGroupsError(null);
+      try {
+        const res = await getGroups();
+        setGroups(res.data.items);
+      } catch (err) {
+        setGroupsError('Failed to load groups.');
+      } finally {
+        setGroupsLoading(false);
+      }
+    };
+    fetchGroups();
+  }, []);
 
   // Constants
   const DAYS = [
@@ -139,7 +155,7 @@ const AddClassScreen: React.FC = () => {
 
   const handleSubmit = async () => {
     setIsSubmitting(true);
-    
+    setApiError(null);
     const errors = validateForm();
     if (Object.keys(errors).length > 0) {
       setValidationErrors(errors);
@@ -148,15 +164,24 @@ const AddClassScreen: React.FC = () => {
     }
 
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      console.log('Form submitted:', formData);
-      
-      // Show success message
+      // Prepare API payload
+      const group = groups.find(g => g.id.toString() === formData.groupId);
+      if (!group) throw new Error('Selected group not found');
+
+      // Calculate start and end times (for demo, use today as base)
+      const today = new Date();
+      const startDate = today.toISOString().split('T')[0];
+      const start = `${startDate}T00:00:00Z`;
+      const end = `${startDate}T23:59:59Z`;
+
+      // API expects: name, groupId, start, end, frequency, startTime, endTime
+      await createClass({
+        groupId: group.id,
+        start,
+        end
+      });
+
       setSubmitSuccess(true);
-      
-      // Clear form after delay
       setTimeout(() => {
         setFormData({
           className: '',
@@ -169,9 +194,8 @@ const AddClassScreen: React.FC = () => {
         setSubmitSuccess(false);
         setValidationErrors({});
       }, 2000);
-      
-    } catch (error) {
-      console.error('Error submitting form:', error);
+    } catch (error: any) {
+      setApiError(error?.response?.data?.message || error.message || 'Error submitting form');
     } finally {
       setIsSubmitting(false);
     }
@@ -308,36 +332,42 @@ const AddClassScreen: React.FC = () => {
             }}>
               Group *
             </label>
-            <select
-              value={formData.groupId}
-              onChange={(e) => handleInputChange('groupId', e.target.value)}
-              onFocus={() => setFocusedField('groupId')}
-              onBlur={() => setFocusedField('')}
-              style={{
-                width: '100%',
-                padding: '0.75rem',
-                borderRadius: '0.5rem',
-                border: `2px solid ${
-                  validationErrors.groupId ? colors.error :
-                  focusedField === 'groupId' ? colors.primary :
-                  colors.border
-                }`,
-                fontSize: '0.875rem',
-                color: formData.groupId ? colors.text.primary : colors.text.secondary,
-                backgroundColor: colors.white,
-                outline: 'none',
-                transition: 'all 0.2s',
-                cursor: 'pointer',
-                boxSizing: 'border-box',
-              }}
-            >
-              <option value="">Select a group</option>
-              {mockGroups.map(group => (
-                <option key={group.id} value={group.id}>
-                  {group.name}
-                </option>
-              ))}
-            </select>
+            {groupsLoading ? (
+              <div style={{ color: colors.text.secondary, fontSize: '0.875rem', marginBottom: '0.5rem' }}>Loading groups...</div>
+            ) : groupsError ? (
+              <div style={{ color: colors.error, fontSize: '0.875rem', marginBottom: '0.5rem' }}>{groupsError}</div>
+            ) : (
+              <select
+                value={formData.groupId}
+                onChange={(e) => handleInputChange('groupId', e.target.value)}
+                onFocus={() => setFocusedField('groupId')}
+                onBlur={() => setFocusedField('')}
+                style={{
+                  width: '100%',
+                  padding: '0.75rem',
+                  borderRadius: '0.5rem',
+                  border: `2px solid ${
+                    validationErrors.groupId ? colors.error :
+                    focusedField === 'groupId' ? colors.primary :
+                    colors.border
+                  }`,
+                  fontSize: '0.875rem',
+                  color: formData.groupId ? colors.text.primary : colors.text.secondary,
+                  backgroundColor: colors.white,
+                  outline: 'none',
+                  transition: 'all 0.2s',
+                  cursor: 'pointer',
+                  boxSizing: 'border-box',
+                }}
+              >
+                <option value="">Select a group</option>
+                {groups.map(group => (
+                  <option key={group.id} value={group.id}>
+                    {group.title}
+                  </option>
+                ))}
+              </select>
+            )}
             {validationErrors.groupId && (
               <p style={{
                 color: colors.error,
@@ -575,8 +605,23 @@ const AddClassScreen: React.FC = () => {
                 lineHeight: '1.5',
               }}>
                 <p style={{ margin: '0 0 0.25rem 0' }}>
-                  <strong>{formData.className}</strong> for {mockGroups.find(g => g.id === formData.groupId)?.name}
+                  <strong>{formData.className}</strong> for {groups.find(g => g.id.toString() === formData.groupId)?.title}
                 </p>
+                        {/* API Error */}
+                        {apiError && (
+                          <div style={{
+                            backgroundColor: colors.errorLight,
+                            color: colors.error,
+                            padding: '1rem',
+                            borderRadius: '0.5rem',
+                            marginBottom: '2rem',
+                            fontSize: '0.875rem',
+                            fontWeight: '500',
+                            textAlign: 'center',
+                          }}>
+                            {apiError}
+                          </div>
+                        )}
                 <p style={{ margin: '0 0 0.25rem 0' }}>
                   {DAYS.filter(day => formData.selectedDays.includes(day.id)).map(day => day.name).join(', ')}
                 </p>

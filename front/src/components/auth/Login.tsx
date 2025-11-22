@@ -79,22 +79,21 @@ const Login: React.FC = () => {
     // setIsLoading(true);
 
     try {
-      // // Use the loginMutation with correct field names
-      // await loginMutation.mutateAsync({
-      // 	login: formData.email, // ← Map email to login
-      // 	password: formData.password,
-      // });
+      // Use the loginMutation and store the token
+      const token = await loginMutation.mutateAsync({
+        login: formData.email, // Map email to login
+        password: formData.password,
+      });
+      localStorage.setItem("token", token);
 
-      // // Store remember me preference if needed
-      // if (formData.rememberMe) {
-      // 	localStorage.setItem('rememberMe', 'true');
-      // }
+      // Store remember me preference if needed
+      if (formData.rememberMe) {
+        localStorage.setItem('rememberMe', 'true');
+      }
 
-      // // On successful login, navigate to dashboard
+      // On successful login, navigate to dashboard
       console.warn("Login successful");
-      navigate("/calendar"); // ← Change this to your dashboard route
-
-      // navigate('/dashboard');
+      navigate("/calendar");
     } catch (error: unknown) {
       // Type guard to safely access error properties
       if (error instanceof Error) {
