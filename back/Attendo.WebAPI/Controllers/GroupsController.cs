@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Attendo.WebAPI.Controllers;
 
 [ApiController]
-[Route("groups")]
+[Route("api/v1/groups")]
 [Authorize]
 public class GroupsController : ControllerBase
 {

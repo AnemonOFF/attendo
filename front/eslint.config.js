@@ -102,7 +102,6 @@ export default defineConfig([
       // Accessibility
       "jsx-a11y/alt-text": "warn",
       "jsx-a11y/anchor-is-valid": "warn",
-      "jsx-a11y/no-autofocus": ["warn", { ignoreNonDOM: true }],
 
       // Promises
       "promise/no-return-wrap": "warn",
@@ -121,6 +120,18 @@ export default defineConfig([
 
       // Prettier - formatting integration (set to warn to avoid blocking)
       "prettier/prettier": "warn",
+    },
+  },
+  {
+    files: ["**/*.test.{ts,tsx}", "**/__tests__/**/*.{ts,tsx}"],
+    rules: {
+      "@typescript-eslint/consistent-type-imports": [
+        "error",
+        {
+          prefer: "type-imports",
+          disallowTypeAnnotations: false,
+        },
+      ],
     },
   },
 ]);

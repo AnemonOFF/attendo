@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Attendo.WebAPI.Controllers;
 
 [ApiController]
-[Route("auth")]
+[Route("api/v1")]
 public class AuthController : ControllerBase
 {
     private readonly IUserRepository _users;

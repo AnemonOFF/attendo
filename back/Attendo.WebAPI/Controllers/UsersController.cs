@@ -11,7 +11,7 @@
 // namespace Attendo.WebAPI.Controllers
 // {
 //     [ApiController]
-//     [Route("users")]
+//     [Route("api/v1/users")]
 //     [Authorize]
 //     public class UsersController : ControllerBase
 //     {

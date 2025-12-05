@@ -155,6 +155,131 @@ import {
 import React, { useState, useMemo, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 
+const GroupDropdown = ({
+  selectedGroupId,
+  setSelectedGroupId,
+  onEditGroup,
+}: {
+  selectedGroupId: string;
+  setSelectedGroupId: (id: string) => void;
+  onEditGroup: (group: Group) => void;
+}) => {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (ref.current && !ref.current.contains(event.target as Node))
+        setOpen(false);
+    };
+    if (open) document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [open]);
+  const selectedGroup =
+    selectedGroupId === "all"
+      ? { id: "all", name: "All Groups" }
+      : mockGroups.find((g) => g.id === selectedGroupId);
+  return (
+    <div ref={ref} style={{ position: "relative", minWidth: 160 }}>
+      <button
+        style={{
+          width: "100%",
+          padding: "0.625rem 1rem",
+          borderRadius: "0.5rem",
+          border: "1px solid #E5E7EB",
+          fontSize: "0.875rem",
+          color: "#111827",
+          background: "#FFF",
+          cursor: "pointer",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+        }}
+        onClick={() => setOpen((curr) => !curr)}
+      >
+        <span>{selectedGroup?.name || ""}</span>
+        <ChevronDown
+          size={18}
+          style={{ transform: open ? "rotate(180deg)" : "" }}
+        />
+      </button>
+      {open && (
+        <div
+          style={{
+            position: "absolute",
+            top: "110%",
+            left: 0,
+            width: "100%",
+            background: "#FFF",
+            border: "1px solid #E5E7EB",
+            borderRadius: "0.5rem",
+            boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+            zIndex: 10,
+            marginTop: 4,
+          }}
+        >
+          <div
+            style={{
+              padding: "0.5rem 1rem",
+              cursor: "pointer",
+              color: "#111827",
+              borderRadius: "0.5rem 0.5rem 0 0",
+              borderBottom: "1px solid #F1F1F1",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+            }}
+            onClick={() => {
+              setSelectedGroupId("all");
+              setOpen(false);
+            }}
+          >
+            All Groups
+          </div>
+          {mockGroups.map((group, i) => (
+            <div
+              key={group.id}
+              style={{
+                padding: "0.5rem 1rem",
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                backgroundColor:
+                  selectedGroupId === group.id ? "#EEF2FF" : "#FFF",
+                borderBottom:
+                  i === mockGroups.length - 1 ? "none" : "1px solid #F1F1F1",
+              }}
+              onClick={() => {
+                setSelectedGroupId(group.id);
+                setOpen(false);
+              }}
+            >
+              <span style={{ color: "black", textAlign: "left" }}>
+                {group.name}
+              </span>
+              <Pencil
+                size={16}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setOpen(false);
+                  onEditGroup(group);
+                }}
+                style={{
+                  color: "#6366F1",
+                  marginLeft: 10,
+                  cursor: "pointer",
+                  verticalAlign: "middle",
+                }}
+                //title="Edit Group"
+              />
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
 const AttendanceCalendar: React.FC = () => {
   // State Management
   const [currentWeekStart, setCurrentWeekStart] = useState<Date>(() => {
