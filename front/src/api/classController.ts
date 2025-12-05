@@ -8,6 +8,10 @@ export const getClasses = (from: string, to: string) =>
 export const createClass = (data: {
   start: string;
   end: string;
+  startTime: string;
+  endTime: string;
+  frequency: string;
+  name: string;
   groupId: number;
 }) => api.post("/classes", data);
 

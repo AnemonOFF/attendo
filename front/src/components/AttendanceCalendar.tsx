@@ -778,10 +778,6 @@ const AttendanceCalendar: React.FC = () => {
                           );
                         })
                     )}
-                    if (groupsLoading || classesLoading) return{" "}
-                    <div>Loading...</div>; if (groupsError) return{" "}
-                    <div>Error loading groups</div>; if (classesError) return{" "}
-                    <div>Error loading classes</div>;
                   </div>
                 </div>
               ))}

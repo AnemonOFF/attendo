@@ -11,14 +11,14 @@ export const useLogin = () =>
 export const useRegister = () =>
   useMutation({
     mutationFn: ({
-      name,
       login,
+      email,
       password,
     }: {
-      name: string;
+      email: string;
       login: string;
       password: string;
-    }) => auth.register(name, login, password),
+    }) => auth.register(login, email, password),
   });
 
 export const useMe = () =>

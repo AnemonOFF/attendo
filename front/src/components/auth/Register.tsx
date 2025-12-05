@@ -220,8 +220,8 @@ const Register: React.FC = () => {
     try {
       // Use the registerMutation with correct field names
       await registerMutation.mutateAsync({
-        name: formData.name,
-        login: formData.email, // ← Map email to login
+        login: formData.name,
+        email: formData.email, // ← Map email to login
         password: formData.password,
       });
 
