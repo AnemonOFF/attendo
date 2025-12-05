@@ -39,8 +39,8 @@ describe("useAuth hooks", () => {
 
     await act(async () => {
       await result.current.mutateAsync({
-        name: "Jane",
-        login: "jane@example.com",
+        login: "Jane",
+        email: "jane@example.com",
         password: "password123",
       });
     });

@@ -178,14 +178,19 @@ const AddClassScreen: React.FC = () => {
       // Calculate start and end times (for demo, use today as base)
       const today = new Date();
       const startDate = today.toISOString().split("T")[0];
-      const start = `${startDate}T00:00:00Z`;
-      const end = `${startDate}T23:59:59Z`;
+      const end = new Date();
+      end.setFullYear(end.getFullYear() + 1);
+      const endDate = end.toISOString().split("T")[0];
 
       // API expects: name, groupId, start, end, frequency, startTime, endTime
       await createClass({
         groupId: group.id,
-        start,
-        end,
+        start: startDate,
+        end: endDate,
+        startTime: formData.startTime,
+        endTime: "23:59:59",
+        frequency: "daily",
+        name: formData.className,
       });
 
       setSubmitSuccess(true);
