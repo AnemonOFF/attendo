@@ -1,54 +1,61 @@
 /* eslint-disable sonarjs/no-duplicate-string */
+/* eslint-disable promise/catch-or-return */
 import { ArrowLeft, ChevronLeft, ChevronRight, Download } from "lucide-react";
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+
+import { updateAttendance } from "../api/attendanceController";
+import { getGroups } from "../api/groupController";
+import { getStudentsByGroup } from "../api/studentController";
 
 // TypeScript Interfaces
 interface Group {
-  id: string;
+  id: number;
   name: string;
   color: string;
 }
 
 interface Student {
-  id: string;
+  id: number;
   name: string;
-  groupId: string;
+  groupId: number;
 }
 
 interface AttendanceRecord {
-  studentId: string;
+  studentId: number;
   date: string; // ISO date string
   present: boolean;
 }
 
-// Mock Data
-const mockGroups: Group[] = [
-  { id: "1", name: "Group 1", color: "#10B981" },
-  { id: "2", name: "Group 2", color: "#3B82F6" },
-  { id: "3", name: "Group 3", color: "#F59E0B" },
-  { id: "4", name: "Group 4", color: "#EF4444" },
-  { id: "5", name: "Group 5", color: "#8B5CF6" },
-];
-
-const mockStudents: Student[] = [
-  { id: "1", name: "Alice Johnson", groupId: "1" },
-  { id: "2", name: "Bob Smith", groupId: "1" },
-  { id: "3", name: "Charlie Brown", groupId: "1" },
-  { id: "4", name: "Diana Prince", groupId: "1" },
-  { id: "5", name: "Ethan Hunt", groupId: "1" },
-  { id: "6", name: "Fiona Apple", groupId: "2" },
-  { id: "7", name: "George Wilson", groupId: "2" },
-  { id: "8", name: "Hannah Montana", groupId: "2" },
-  { id: "9", name: "Ian Malcolm", groupId: "3" },
-  { id: "10", name: "Julia Roberts", groupId: "3" },
-  { id: "11", name: "Kevin Hart", groupId: "4" },
-  { id: "12", name: "Laura Croft", groupId: "4" },
-  { id: "13", name: "Michael Scott", groupId: "5" },
-  { id: "14", name: "Nina Simone", groupId: "5" },
-];
-
+// Remove mockGroups, use API
 const ClassAttendanceScreen: React.FC = () => {
+  // Confirm attendance state
+  const [confirmLoading, setConfirmLoading] = useState(false);
+  const [confirmError, setConfirmError] = useState<string | null>(null);
+  const [confirmSuccess, setConfirmSuccess] = useState<string | null>(null);
+
+  // Handler to send attendance to backend
+  const handleConfirmAttendance = async () => {
+    if (!state?.id) {
+      setConfirmError("Class ID not found.");
+      return;
+    }
+    setConfirmLoading(true);
+    setConfirmError(null);
+    setConfirmSuccess(null);
+    try {
+      // Only send present student IDs for the week
+      const presentStudentIds = attendanceRecords
+        .filter((r: AttendanceRecord) => r.present)
+        .map((r: AttendanceRecord) => r.studentId);
+      await updateAttendance(state.id, presentStudentIds);
+      setConfirmSuccess("Attendance submitted successfully!");
+    } catch {
+      setConfirmError("Failed to submit attendance.");
+    } finally {
+      setConfirmLoading(false);
+    }
+  };
   // State Management
   const [currentWeekStart, setCurrentWeekStart] = useState<Date>(() => {
     const today = new Date();
@@ -59,7 +66,29 @@ const ClassAttendanceScreen: React.FC = () => {
     monday.setHours(0, 0, 0, 0);
     return monday;
   });
-  const [selectedGroupId, setSelectedGroupId] = useState<string>("1");
+  const [groups, setGroups] = useState<Group[]>([]);
+  const [groupsLoading, setGroupsLoading] = useState<boolean>(true);
+  const [groupsError, setGroupsError] = useState<string | null>(null);
+  const [selectedGroupId, setSelectedGroupId] = useState<number | null>(null);
+  // Fetch groups from API
+  useEffect(() => {
+    setGroupsLoading(true);
+    getGroups()
+      .then((res) => {
+        setGroups(res.data.items || res.data);
+        setGroupsError(null);
+        if (
+          (res.data.items && res.data.items.length > 0) ||
+          res.data.length > 0
+        ) {
+          setSelectedGroupId(
+            res.data.items?.[0]?.id ?? res.data[0]?.id ?? null,
+          );
+        }
+      })
+      .catch(() => setGroupsError("Failed to load groups"))
+      .finally(() => setGroupsLoading(false));
+  }, []);
   const [attendanceRecords, setAttendanceRecords] = useState<
     AttendanceRecord[]
   >([]);
@@ -120,12 +149,28 @@ const ClassAttendanceScreen: React.FC = () => {
     navigate(-1);
   };
 
-  // Get filtered students
-  const filteredStudents = useMemo(() => {
-    return mockStudents.filter(
-      (student) => student.groupId === selectedGroupId,
-    );
+  // Students state
+  const [students, setStudents] = useState<Student[]>([]);
+  const [studentsLoading, setStudentsLoading] = useState<boolean>(false);
+  const [studentsError, setStudentsError] = useState<string | null>(null);
+
+  // Fetch students when group changes
+  useEffect(() => {
+    if (!selectedGroupId) {
+      setStudents([]);
+      return;
+    }
+    setStudentsLoading(true);
+    getStudentsByGroup(selectedGroupId)
+      .then((res) => {
+        setStudents(res.data.items || res.data);
+        setStudentsError(null);
+      })
+      .catch(() => setStudentsError("Failed to load students"))
+      .finally(() => setStudentsLoading(false));
   }, [selectedGroupId]);
+
+  const filteredStudents = students;
 
   // Get week dates
   const weekDates = useMemo(
@@ -134,7 +179,7 @@ const ClassAttendanceScreen: React.FC = () => {
   );
 
   // Check if student is present on a date
-  const isPresent = (studentId: string, date: Date): boolean => {
+  const isPresent = (studentId: number, date: Date): boolean => {
     const dateStr = formatDateISO(date);
     const record = attendanceRecords.find(
       (r) => r.studentId === studentId && r.date === dateStr,
@@ -143,7 +188,7 @@ const ClassAttendanceScreen: React.FC = () => {
   };
 
   // Toggle individual attendance
-  const toggleAttendance = (studentId: string, date: Date) => {
+  const toggleAttendance = (studentId: number, date: Date) => {
     const dateStr = formatDateISO(date);
     setAttendanceRecords((prev) => {
       const existingIndex = prev.findIndex(
@@ -323,34 +368,40 @@ const ClassAttendanceScreen: React.FC = () => {
         >
           {/* Left - Group Selection */}
           <div>
-            <select
-              value={selectedGroupId}
-              onChange={(e) => setSelectedGroupId(e.target.value)}
-              style={{
-                padding: "0.625rem 1rem",
-                borderRadius: "0.5rem",
-                border: `1px solid ${colors.border}`,
-                fontSize: "0.875rem",
-                color: colors.text.primary,
-                backgroundColor: colors.white,
-                cursor: "pointer",
-                outline: "none",
-                transition: "all 0.2s",
-                minWidth: "150px",
-              }}
-              onMouseEnter={(e) =>
-                (e.currentTarget.style.borderColor = colors.primary)
-              }
-              onMouseLeave={(e) =>
-                (e.currentTarget.style.borderColor = colors.border)
-              }
-            >
-              {mockGroups.map((group) => (
-                <option key={group.id} value={group.id}>
-                  {group.name}
-                </option>
-              ))}
-            </select>
+            {groupsLoading ? (
+              <span>Loading groups...</span>
+            ) : groupsError ? (
+              <span style={{ color: "red" }}>{groupsError}</span>
+            ) : (
+              <select
+                value={selectedGroupId ?? ""}
+                onChange={(e) => setSelectedGroupId(Number(e.target.value))}
+                style={{
+                  padding: "0.625rem 1rem",
+                  borderRadius: "0.5rem",
+                  border: `1px solid ${colors.border}`,
+                  fontSize: "0.875rem",
+                  color: colors.text.primary,
+                  backgroundColor: colors.white,
+                  cursor: "pointer",
+                  outline: "none",
+                  transition: "all 0.2s",
+                  minWidth: "150px",
+                }}
+                onMouseEnter={(e) =>
+                  (e.currentTarget.style.borderColor = colors.primary)
+                }
+                onMouseLeave={(e) =>
+                  (e.currentTarget.style.borderColor = colors.border)
+                }
+              >
+                {groups.map((group) => (
+                  <option key={group.id} value={group.id}>
+                    {group.name}
+                  </option>
+                ))}
+              </select>
+            )}
           </div>
 
           {/* Right - Export CSV */}
@@ -388,6 +439,41 @@ const ClassAttendanceScreen: React.FC = () => {
           </button>
         </div>
 
+        {/* Confirm Attendance Button */}
+        <div
+          style={{
+            marginBottom: "1rem",
+            display: "flex",
+            gap: "1rem",
+            alignItems: "center",
+          }}
+        >
+          <button
+            onClick={handleConfirmAttendance}
+            disabled={
+              confirmLoading || studentsLoading || !filteredStudents.length
+            }
+            style={{
+              padding: "0.75rem 1.5rem",
+              borderRadius: "0.5rem",
+              border: "none",
+              backgroundColor: confirmLoading
+                ? colors.text.light
+                : colors.primary,
+              color: colors.white,
+              fontWeight: 600,
+              fontSize: "1rem",
+              cursor: confirmLoading ? "not-allowed" : "pointer",
+              transition: "all 0.2s",
+            }}
+          >
+            {confirmLoading ? "Submitting..." : "Confirm Attendance"}
+          </button>
+          {confirmError && <span style={{ color: "red" }}>{confirmError}</span>}
+          {confirmSuccess && (
+            <span style={{ color: "green" }}>{confirmSuccess}</span>
+          )}
+        </div>
         {/* Attendance Grid */}
         <div
           style={{
@@ -549,71 +635,91 @@ const ClassAttendanceScreen: React.FC = () => {
               </thead>
 
               <tbody>
-                {filteredStudents.map((student, studentIndex) => (
-                  <tr key={student.id}>
-                    {/* Student Name Cell */}
-                    <td
-                      style={{
-                        padding: "1rem",
-                        fontSize: "0.875rem",
-                        color: colors.text.primary,
-                        backgroundColor: colors.white,
-                        border: `1px solid ${colors.border}`,
-                        borderTop: "none",
-                        borderRight: "none",
-                        borderBottomLeftRadius:
-                          studentIndex === filteredStudents.length - 1
-                            ? "0.5rem"
-                            : 0,
-                      }}
-                    >
-                      {student.name}
-                    </td>
-
-                    {/* Attendance Checkboxes */}
-                    {weekDates.map((date, dateIndex) => {
-                      const present = isPresent(student.id, date);
-                      const isTodayDate = isToday(date);
-
-                      return (
-                        <td
-                          key={dateIndex}
-                          style={{
-                            padding: "1rem",
-                            textAlign: "center",
-                            backgroundColor: isTodayDate
-                              ? colors.currentDay
-                              : colors.white,
-                            border: `1px solid ${colors.border}`,
-                            borderTop: "none",
-                            borderLeft: "none",
-                            borderRight:
-                              dateIndex === weekDates.length - 1
-                                ? `1px solid ${colors.border}`
-                                : "none",
-                            borderBottomRightRadius:
-                              studentIndex === filteredStudents.length - 1 &&
-                              dateIndex === weekDates.length - 1
-                                ? "0.5rem"
-                                : 0,
-                          }}
-                        >
-                          <input
-                            type="checkbox"
-                            checked={present}
-                            onChange={() => toggleAttendance(student.id, date)}
-                            style={{
-                              width: "18px",
-                              height: "18px",
-                              cursor: "pointer",
-                              accentColor: colors.primary,
-                            }}
-                          />
-                        </td>
-                      );
-                    })}
+                {studentsLoading ? (
+                  <tr>
+                    <td colSpan={weekDates.length + 1}>Loading students...</td>
                   </tr>
-                ))}
+                ) : studentsError ? (
+                  <tr>
+                    <td colSpan={weekDates.length + 1} style={{ color: "red" }}>
+                      {studentsError}
+                    </td>
+                  </tr>
+                ) : filteredStudents.length === 0 ? (
+                  <tr>
+                    <td colSpan={weekDates.length + 1}>
+                      No students found for this group.
+                    </td>
+                  </tr>
+                ) : (
+                  filteredStudents.map((student, studentIndex) => (
+                    <tr key={student.id}>
+                      {/* Student Name Cell */}
+                      <td
+                        style={{
+                          padding: "1rem",
+                          fontSize: "0.875rem",
+                          color: colors.text.primary,
+                          backgroundColor: colors.white,
+                          border: `1px solid ${colors.border}`,
+                          borderTop: "none",
+                          borderRight: "none",
+                          borderBottomLeftRadius:
+                            studentIndex === filteredStudents.length - 1
+                              ? "0.5rem"
+                              : 0,
+                        }}
+                      >
+                        {student.name}
+                      </td>
+
+                      {/* Attendance Checkboxes */}
+                      {weekDates.map((date, dateIndex) => {
+                        const present = isPresent(student.id, date);
+                        const isTodayDate = isToday(date);
+
+                        return (
+                          <td
+                            key={dateIndex}
+                            style={{
+                              padding: "1rem",
+                              textAlign: "center",
+                              backgroundColor: isTodayDate
+                                ? colors.currentDay
+                                : colors.white,
+                              border: `1px solid ${colors.border}`,
+                              borderTop: "none",
+                              borderLeft: "none",
+                              borderRight:
+                                dateIndex === weekDates.length - 1
+                                  ? `1px solid ${colors.border}`
+                                  : "none",
+                              borderBottomRightRadius:
+                                studentIndex === filteredStudents.length - 1 &&
+                                dateIndex === weekDates.length - 1
+                                  ? "0.5rem"
+                                  : 0,
+                            }}
+                          >
+                            <input
+                              type="checkbox"
+                              checked={present}
+                              onChange={() =>
+                                toggleAttendance(student.id, date)
+                              }
+                              style={{
+                                width: "18px",
+                                height: "18px",
+                                cursor: "pointer",
+                                accentColor: colors.primary,
+                              }}
+                            />
+                          </td>
+                        );
+                      })}
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
@@ -639,7 +745,7 @@ const ClassAttendanceScreen: React.FC = () => {
               }}
             >
               <strong>{filteredStudents.length}</strong> students in{" "}
-              {mockGroups.find((g) => g.id === selectedGroupId)?.name}
+              {groups.find((g) => g.id === selectedGroupId)?.name}
             </div>
             <div
               style={{

@@ -1,7 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable sonarjs/no-duplicate-string */
 import { ArrowLeft } from "lucide-react";
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+
+import { getGroups, createGroup } from "../api/groupController";
 
 // TypeScript interfaces
 interface AddGroupModalProps {
@@ -84,33 +87,6 @@ const AddGroupModal: React.FC<AddGroupModalProps> = ({
     }
   }, [isOpen]);
 
-  // Handle form submission
-  const handleSubmit = useCallback(async () => {
-    const trimmedName = state.groupName.trim();
-    const validationError = validateGroupName(trimmedName);
-
-    if (validationError) {
-      setState((prev) => ({ ...prev, validationError }));
-      inputRef.current?.focus();
-      return;
-    }
-
-    setState((prev) => ({
-      ...prev,
-      isSubmitting: true,
-      validationError: null,
-    }));
-
-    try {
-      await onAddGroup(trimmedName);
-      onClose();
-    } catch {
-      // Error handled by parent component
-    } finally {
-      setState((prev) => ({ ...prev, isSubmitting: false }));
-    }
-  }, [onAddGroup, onClose, state.groupName]);
-
   // Keyboard event handling
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -132,7 +108,8 @@ const AddGroupModal: React.FC<AddGroupModalProps> = ({
       document.removeEventListener("keydown", handleKeyDown);
       document.body.style.overflow = "unset";
     };
-  }, [isOpen, state.isSubmitting, handleSubmit, onClose]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen, state.isSubmitting]);
 
   // Form validation
   const validateGroupName = (name: string): string | null => {
@@ -156,6 +133,33 @@ const AddGroupModal: React.FC<AddGroupModalProps> = ({
       groupName: value,
       validationError: value ? validateGroupName(value) : null,
     }));
+  };
+
+  // Handle form submission
+  const handleSubmit = async () => {
+    const trimmedName = state.groupName.trim();
+    const validationError = validateGroupName(trimmedName);
+
+    if (validationError) {
+      setState((prev) => ({ ...prev, validationError }));
+      inputRef.current?.focus();
+      return;
+    }
+
+    setState((prev) => ({
+      ...prev,
+      isSubmitting: true,
+      validationError: null,
+    }));
+
+    try {
+      await onAddGroup(trimmedName);
+      onClose();
+    } catch {
+      // Error handled by parent component
+    } finally {
+      setState((prev) => ({ ...prev, isSubmitting: false }));
+    }
   };
 
   // Handle overlay click
@@ -499,13 +503,27 @@ const AddGroupModal: React.FC<AddGroupModalProps> = ({
 // Integration Example Component
 const GroupManagementDemo = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [groups, setGroups] = useState([
-    "Math Class",
-    "Science Club",
-    "Art Workshop",
-  ]);
+  const [groups, setGroups] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Fetch groups from API on mount
+  useEffect(() => {
+    const fetchGroups = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const res = await getGroups();
+        // API returns AxiosResponse, so use res.data.items
+        setGroups(res.data.items.map((g: any) => g.title));
+      } catch {
+        setError("Failed to load groups.");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchGroups();
+  }, []);
 
   const navigate = useNavigate();
   // const { state } = location;
@@ -517,34 +535,23 @@ const GroupManagementDemo = () => {
     white: "#FFFFFF",
   };
 
-  // Mock API function - replace with your actual implementation
+  // API function to add a group
   const handleAddGroup = async (groupName: string): Promise<void> => {
     setLoading(true);
     setError(null);
-
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-
-      // Simulate potential error (10% chance)
-      if (Math.random() < 0.1) {
-        throw new Error("Failed to create group. Please try again.");
-      }
-
-      // Check for duplicate names
-      if (
-        groups.some((group) => group.toLowerCase() === groupName.toLowerCase())
-      ) {
-        throw new Error("A group with this name already exists.");
-      }
-
-      // Add the group
-      setGroups((prev) => [...prev, groupName]);
-    } catch (err) {
+      // Call API to create group
+      await createGroup({ title: groupName });
+      // Refresh group list
+      const res = await getGroups();
+      setGroups(res.data.items.map((g: any) => g.title));
+    } catch (err: any) {
       setError(
-        err instanceof Error ? err.message : "An unexpected error occurred",
+        err?.response?.data?.message ||
+          err.message ||
+          "Failed to create group.",
       );
-      throw err; // Re-throw to let modal handle the error state
+      throw err;
     } finally {
       setLoading(false);
     }

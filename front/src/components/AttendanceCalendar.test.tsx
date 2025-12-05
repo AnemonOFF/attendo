@@ -5,6 +5,19 @@ import { vi } from "vitest";
 
 import AttendanceCalendar from "./AttendanceCalendar";
 
+const hooksMocks = vi.hoisted(() => ({
+  useGroups: vi.fn(),
+  useClasses: vi.fn(),
+}));
+
+vi.mock("../hooks/useGroups", () => ({
+  useGroups: hooksMocks.useGroups,
+}));
+
+vi.mock("../hooks/useClasses", () => ({
+  useClasses: hooksMocks.useClasses,
+}));
+
 const mockNavigate = vi.fn();
 
 vi.mock("react-router-dom", async () => {
@@ -18,9 +31,58 @@ vi.mock("react-router-dom", async () => {
   };
 });
 
+const computeWeekStart = () => {
+  const today = new Date();
+  const dayOfWeek = today.getDay();
+  const diff = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+  const monday = new Date(today);
+  monday.setDate(today.getDate() + diff);
+  monday.setHours(12, 0, 0, 0);
+  return monday;
+};
+
+const weekStart = computeWeekStart();
+const dateForOffset = (offset: number) => {
+  const date = new Date(weekStart);
+  date.setDate(weekStart.getDate() + offset);
+  return date.toISOString();
+};
+
+const yogaGroup = { id: 1, title: "Yoga", students: [] };
+const pilatesGroup = { id: 2, title: "Pilates", students: [] };
+
+const mockGroups = [yogaGroup, pilatesGroup];
+
+const mockClasses = [
+  {
+    id: 1,
+    name: "Morning Yoga",
+    start: dateForOffset(0),
+    end: dateForOffset(0),
+    frequency: "Weekly",
+    startTime: "08:00",
+    endTime: "09:00",
+    group: yogaGroup,
+  },
+  {
+    id: 2,
+    name: "Mat Pilates",
+    start: dateForOffset(2),
+    end: dateForOffset(2),
+    frequency: "Weekly",
+    startTime: "10:00",
+    endTime: "11:00",
+    group: pilatesGroup,
+  },
+];
+
 describe("AttendanceCalendar", () => {
   beforeEach(() => {
     mockNavigate.mockReset();
+    hooksMocks.useGroups.mockReset();
+    hooksMocks.useClasses.mockReset();
+    hooksMocks.useGroups.mockReturnValue({ data: mockGroups });
+    hooksMocks.useClasses.mockReturnValue({ data: mockClasses });
   });
 
   it("updates week range when navigating between weeks", async () => {
@@ -70,7 +132,7 @@ describe("AttendanceCalendar", () => {
     await user.click(screen.getByText("Morning Yoga"));
     expect(mockNavigate).toHaveBeenCalledWith("/classInfo", {
       state: expect.objectContaining({
-        id: "1",
+        id: 1,
         name: "Morning Yoga",
       }),
     });

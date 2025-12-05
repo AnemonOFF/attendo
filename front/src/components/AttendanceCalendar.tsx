@@ -1,4 +1,6 @@
 /* eslint-disable sonarjs/no-duplicate-string */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+// API Types
 import {
   ChevronLeft,
   ChevronRight,
@@ -9,238 +11,51 @@ import {
 import React, { useState, useMemo, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 
-// TypeScript Interfaces
+import { useClasses } from "../hooks/useClasses";
+import { useGroups } from "../hooks/useGroups";
+
 interface Group {
-  id: string;
-  name: string;
-  color: string;
+  id: number;
+  title: string;
+  students: any[];
 }
 
 interface Class {
-  id: string;
+  id: number;
   name: string;
-  groupId: string;
-  dayOfWeek: number; // 0 = Monday, 6 = Sunday
-  startHour: number; // 7-21 (7 AM - 9 PM)
-  duration: number; // in hours (can be decimal like 1.5)
-  color: string;
+  start: string; // date
+  end: string; // date
+  frequency: string;
+  startTime: string; // time
+  endTime: string; // time
+  group: Group;
 }
 
-// Mock Data
-const mockGroups: Group[] = [
-  { id: "1", name: "Yoga Basics", color: "#10B981" },
-  { id: "2", name: "Advanced Fitness", color: "#3B82F6" },
-  { id: "3", name: "Dance Classes", color: "#F59E0B" },
-  { id: "4", name: "Martial Arts", color: "#EF4444" },
-  { id: "5", name: "Pilates", color: "#8B5CF6" },
+// Color palette for groups
+const groupColors = [
+  "#10B981",
+  "#3B82F6",
+  "#F59E0B",
+  "#EF4444",
+  "#8B5CF6",
+  "#6366F1",
+  "#F472B6",
+  "#F87171",
+  "#34D399",
+  "#60A5FA",
 ];
 
-const mockClasses: Class[] = [
-  {
-    id: "1",
-    name: "Morning Yoga",
-    groupId: "1",
-    dayOfWeek: 0,
-    startHour: 8,
-    duration: 1.5,
-    color: "#10B981",
-  },
-  {
-    id: "2",
-    name: "Cardio Blast",
-    groupId: "2",
-    dayOfWeek: 0,
-    startHour: 10,
-    duration: 1,
-    color: "#3B82F6",
-  },
-  {
-    id: "3",
-    name: "Evening Flow",
-    groupId: "1",
-    dayOfWeek: 0,
-    startHour: 18,
-    duration: 1,
-    color: "#10B981",
-  },
-
-  {
-    id: "4",
-    name: "HIIT Training",
-    groupId: "2",
-    dayOfWeek: 1,
-    startHour: 9,
-    duration: 1,
-    color: "#3B82F6",
-  },
-  {
-    id: "5",
-    name: "Ballet Basics",
-    groupId: "3",
-    dayOfWeek: 1,
-    startHour: 14,
-    duration: 2,
-    color: "#F59E0B",
-  },
-  {
-    id: "6",
-    name: "Karate Kids",
-    groupId: "4",
-    dayOfWeek: 1,
-    startHour: 16,
-    duration: 1,
-    color: "#EF4444",
-  },
-
-  {
-    id: "7",
-    name: "Pilates Core",
-    groupId: "5",
-    dayOfWeek: 2,
-    startHour: 7,
-    duration: 1,
-    color: "#8B5CF6",
-  },
-  {
-    id: "8",
-    name: "Strength",
-    groupId: "2",
-    dayOfWeek: 2,
-    startHour: 11,
-    duration: 1.5,
-    color: "#3B82F6",
-  },
-  {
-    id: "9",
-    name: "Hip Hop",
-    groupId: "3",
-    dayOfWeek: 2,
-    startHour: 17,
-    duration: 1.5,
-    color: "#F59E0B",
-  },
-
-  {
-    id: "10",
-    name: "Yoga Flow",
-    groupId: "1",
-    dayOfWeek: 3,
-    startHour: 8,
-    duration: 1,
-    color: "#10B981",
-  },
-  {
-    id: "11",
-    name: "Boxing",
-    groupId: "4",
-    dayOfWeek: 3,
-    startHour: 12,
-    duration: 1,
-    color: "#EF4444",
-  },
-  {
-    id: "12",
-    name: "Reformer",
-    groupId: "5",
-    dayOfWeek: 3,
-    startHour: 15,
-    duration: 1.5,
-    color: "#8B5CF6",
-  },
-
-  {
-    id: "13",
-    name: "CrossFit",
-    groupId: "2",
-    dayOfWeek: 4,
-    startHour: 7,
-    duration: 1,
-    color: "#3B82F6",
-  },
-  {
-    id: "14",
-    name: "Contemporary",
-    groupId: "3",
-    dayOfWeek: 4,
-    startHour: 13,
-    duration: 2,
-    color: "#F59E0B",
-  },
-  {
-    id: "15",
-    name: "Tai Chi",
-    groupId: "4",
-    dayOfWeek: 4,
-    startHour: 19,
-    duration: 1,
-    color: "#EF4444",
-  },
-
-  {
-    id: "16",
-    name: "Power Yoga",
-    groupId: "1",
-    dayOfWeek: 5,
-    startHour: 9,
-    duration: 1.5,
-    color: "#10B981",
-  },
-  {
-    id: "17",
-    name: "Spin Class",
-    groupId: "2",
-    dayOfWeek: 5,
-    startHour: 11,
-    duration: 1,
-    color: "#3B82F6",
-  },
-  {
-    id: "18",
-    name: "Mat Pilates",
-    groupId: "5",
-    dayOfWeek: 5,
-    startHour: 16,
-    duration: 1,
-    color: "#8B5CF6",
-  },
-
-  {
-    id: "19",
-    name: "Salsa",
-    groupId: "3",
-    dayOfWeek: 6,
-    startHour: 10,
-    duration: 2,
-    color: "#F59E0B",
-  },
-  {
-    id: "20",
-    name: "Kickboxing",
-    groupId: "4",
-    dayOfWeek: 6,
-    startHour: 14,
-    duration: 1,
-    color: "#EF4444",
-  },
-  {
-    id: "21",
-    name: "Restorative",
-    groupId: "1",
-    dayOfWeek: 6,
-    startHour: 18,
-    duration: 1.5,
-    color: "#10B981",
-  },
-];
-
+// GroupDropdown using API data
 const GroupDropdown = ({
   selectedGroupId,
   setSelectedGroupId,
   onEditGroup,
+  groups,
 }: {
   selectedGroupId: string;
   setSelectedGroupId: (id: string) => void;
   onEditGroup: (group: Group) => void;
+  groups: Group[];
 }) => {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement | null>(null);
@@ -254,8 +69,8 @@ const GroupDropdown = ({
   }, [open]);
   const selectedGroup =
     selectedGroupId === "all"
-      ? { id: "all", name: "All Groups" }
-      : mockGroups.find((g) => g.id === selectedGroupId);
+      ? { id: "all", title: "All Groups", students: [] }
+      : groups.find((g) => g.id.toString() === selectedGroupId);
   return (
     <div ref={ref} style={{ position: "relative", minWidth: 160 }}>
       <button
@@ -274,7 +89,7 @@ const GroupDropdown = ({
         }}
         onClick={() => setOpen((curr) => !curr)}
       >
-        <span>{selectedGroup?.name || ""}</span>
+        <span>{selectedGroup?.title || ""}</span>
         <ChevronDown
           size={18}
           style={{ transform: open ? "rotate(180deg)" : "" }}
@@ -313,50 +128,182 @@ const GroupDropdown = ({
           >
             All Groups
           </div>
-          {mockGroups.map((group, i) => (
-            <div
-              key={group.id}
-              style={{
-                padding: "0.5rem 1rem",
-                cursor: "pointer",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                backgroundColor:
-                  selectedGroupId === group.id ? "#EEF2FF" : "#FFF",
-                borderBottom:
-                  i === mockGroups.length - 1 ? "none" : "1px solid #F1F1F1",
-              }}
-              onClick={() => {
-                setSelectedGroupId(group.id);
-                setOpen(false);
-              }}
-            >
-              <span style={{ color: "black", textAlign: "left" }}>
-                {group.name}
-              </span>
-              <Pencil
-                size={16}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setOpen(false);
-                  onEditGroup(group);
-                }}
-                style={{
-                  color: "#6366F1",
-                  marginLeft: 10,
-                  cursor: "pointer",
-                  verticalAlign: "middle",
-                }}
-                //title="Edit Group"
-              />
+          {groups.length === 0 ? (
+            <div style={{ padding: "0.5rem 1rem", color: "#888" }}>
+              No groups found
             </div>
-          ))}
+          ) : (
+            groups.map((group, i) => (
+              <div
+                key={group.id}
+                style={{
+                  padding: "0.5rem 1rem",
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  backgroundColor:
+                    selectedGroupId === group.id.toString()
+                      ? "#EEF2FF"
+                      : "#FFF",
+                  borderBottom:
+                    i === groups.length - 1 ? "none" : "1px solid #F1F1F1",
+                }}
+                onClick={() => {
+                  setSelectedGroupId(group.id.toString());
+                  setOpen(false);
+                }}
+              >
+                <span style={{ color: "black", textAlign: "left" }}>
+                  {group.title}
+                </span>
+                <Pencil
+                  size={16}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setOpen(false);
+                    onEditGroup(group);
+                  }}
+                  style={{
+                    color: "#6366F1",
+                    marginLeft: 10,
+                    cursor: "pointer",
+                    verticalAlign: "middle",
+                  }}
+                />
+              </div>
+            ))
+          )}
         </div>
       )}
     </div>
   );
 };
+
+// const GroupDropdown = ({
+//   selectedGroupId,
+//   setSelectedGroupId,
+//   onEditGroup,
+// }: {
+//   selectedGroupId: string;
+//   setSelectedGroupId: (id: string) => void;
+//   onEditGroup: (group: Group) => void;
+// }) => {
+//   const [open, setOpen] = useState(false);
+//   const ref = useRef<HTMLDivElement | null>(null);
+//   useEffect(() => {
+//     const handleClickOutside = (event: MouseEvent) => {
+//       if (ref.current && !ref.current.contains(event.target as Node))
+//         setOpen(false);
+//     };
+//     if (open) document.addEventListener("mousedown", handleClickOutside);
+//     return () => document.removeEventListener("mousedown", handleClickOutside);
+//   }, [open]);
+//   const selectedGroup =
+//     selectedGroupId === "all"
+//       ? { id: "all", name: "All Groups" }
+//       : mockGroups.find((g) => g.id === selectedGroupId);
+//   return (
+//     <div ref={ref} style={{ position: "relative", minWidth: 160 }}>
+//       <button
+//         style={{
+//           width: "100%",
+//           padding: "0.625rem 1rem",
+//           borderRadius: "0.5rem",
+//           border: "1px solid #E5E7EB",
+//           fontSize: "0.875rem",
+//           color: "#111827",
+//           background: "#FFF",
+//           cursor: "pointer",
+//           display: "flex",
+//           alignItems: "center",
+//           justifyContent: "space-between",
+//         }}
+//         onClick={() => setOpen((curr) => !curr)}
+//       >
+//         <span>{selectedGroup?.name || ""}</span>
+//         <ChevronDown
+//           size={18}
+//           style={{ transform: open ? "rotate(180deg)" : "" }}
+//         />
+//       </button>
+//       {open && (
+//         <div
+//           style={{
+//             position: "absolute",
+//             top: "110%",
+//             left: 0,
+//             width: "100%",
+//             background: "#FFF",
+//             border: "1px solid #E5E7EB",
+//             borderRadius: "0.5rem",
+//             boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+//             zIndex: 10,
+//             marginTop: 4,
+//           }}
+//         >
+//           <div
+//             style={{
+//               padding: "0.5rem 1rem",
+//               cursor: "pointer",
+//               color: "#111827",
+//               borderRadius: "0.5rem 0.5rem 0 0",
+//               borderBottom: "1px solid #F1F1F1",
+//               display: "flex",
+//               alignItems: "center",
+//               justifyContent: "space-between",
+//             }}
+//             onClick={() => {
+//               setSelectedGroupId("all");
+//               setOpen(false);
+//             }}
+//           >
+//             All Groups
+//           </div>
+//           {mockGroups.map((group, i) => (
+//             <div
+//               key={group.id}
+//               style={{
+//                 padding: "0.5rem 1rem",
+//                 cursor: "pointer",
+//                 display: "flex",
+//                 alignItems: "center",
+//                 justifyContent: "space-between",
+//                 backgroundColor:
+//                   selectedGroupId === group.id ? "#EEF2FF" : "#FFF",
+//                 borderBottom:
+//                   i === mockGroups.length - 1 ? "none" : "1px solid #F1F1F1",
+//               }}
+//               onClick={() => {
+//                 setSelectedGroupId(group.id);
+//                 setOpen(false);
+//               }}
+//             >
+//               <span style={{ color: "black", textAlign: "left" }}>
+//                 {group.name}
+//               </span>
+//               <Pencil
+//                 size={16}
+//                 onClick={(e) => {
+//                   e.stopPropagation();
+//                   setOpen(false);
+//                   onEditGroup(group);
+//                 }}
+//                 style={{
+//                   color: "#6366F1",
+//                   marginLeft: 10,
+//                   cursor: "pointer",
+//                   verticalAlign: "middle",
+//                 }}
+//                 //title="Edit Group"
+//               />
+//             </div>
+//           ))}
+//         </div>
+//       )}
+//     </div>
+//   );
+// };
 
 const AttendanceCalendar: React.FC = () => {
   // State Management
@@ -370,6 +317,26 @@ const AttendanceCalendar: React.FC = () => {
     return monday;
   });
   const [selectedGroupId, setSelectedGroupId] = useState<string>("all");
+  // Fetch groups
+  const { data: groups = [] } = useGroups();
+
+  // Calculate week range for API
+  const weekStart = new Date(currentWeekStart);
+  const weekEnd = new Date(currentWeekStart);
+  weekEnd.setDate(weekEnd.getDate() + 6);
+  const from = weekStart.toISOString().split("T")[0] + "T00:00:00Z";
+  const to = weekEnd.toISOString().split("T")[0] + "T23:59:59Z";
+
+  // Fetch classes
+  const { data: classes = [] } = useClasses(from, to);
+
+  // Filter classes by selected group
+  const filteredClasses = useMemo(() => {
+    if (selectedGroupId === "all") return classes;
+    return classes.filter(
+      (cls: any) => cls.group.id.toString() === selectedGroupId,
+    );
+  }, [selectedGroupId, classes]);
   const navigate = useNavigate();
 
   // Constants
@@ -428,12 +395,6 @@ const AttendanceCalendar: React.FC = () => {
     console.warn("Navigate to Class Info screen");
     navigate("/classInfo", { state: classInfo });
   };
-
-  // Filter classes by selected group
-  const filteredClasses = useMemo(() => {
-    if (selectedGroupId === "all") return mockClasses;
-    return mockClasses.filter((cls) => cls.groupId === selectedGroupId);
-  }, [selectedGroupId]);
 
   // Format time display
   const formatTime = (hour: number): string => {
@@ -501,6 +462,7 @@ const AttendanceCalendar: React.FC = () => {
               onEditGroup={(group) => {
                 handleEditGroup(group);
               }}
+              groups={groups}
             />
             <button
               onClick={handleAddGroup}
@@ -723,63 +685,103 @@ const AttendanceCalendar: React.FC = () => {
                         }}
                       />
                     ))}
-
                     {/* Classes for this day */}
-                    {filteredClasses
-                      .filter((cls) => cls.dayOfWeek === dayIndex)
-                      .map((cls) => {
-                        const topPosition = (cls.startHour - 7) * HOUR_HEIGHT;
-                        const height = cls.duration * HOUR_HEIGHT;
-
-                        return (
-                          <div
-                            key={cls.id}
-                            style={{
-                              position: "absolute",
-                              top: `${topPosition}px`,
-                              left: "4px",
-                              right: "4px",
-                              height: `${height - 8}px`,
-                              backgroundColor: cls.color,
-                              borderRadius: "0.375rem",
-                              padding: "0.5rem",
-                              color: colors.white,
-                              fontSize: "0.75rem",
-                              fontWeight: "600",
-                              overflow: "hidden",
-                              cursor: "pointer",
-                              transition: "all 0.2s",
-                              boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
-                            }}
-                            onMouseEnter={(e) => {
-                              e.currentTarget.style.transform = "scale(1.02)";
-                              e.currentTarget.style.boxShadow =
-                                "0 4px 8px rgba(0, 0, 0, 0.2)";
-                              e.currentTarget.style.zIndex = "10";
-                            }}
-                            onMouseLeave={(e) => {
-                              e.currentTarget.style.transform = "scale(1)";
-                              e.currentTarget.style.boxShadow =
-                                "0 2px 4px rgba(0, 0, 0, 0.1)";
-                              e.currentTarget.style.zIndex = "1";
-                            }}
-                            onClick={() => handleClassInfo(cls)}
-                          >
+                    {filteredClasses.length === 0 ? (
+                      <div
+                        style={{
+                          padding: "0.5rem",
+                          color: "#888",
+                          textAlign: "center",
+                        }}
+                      >
+                        No classes found
+                      </div>
+                    ) : (
+                      filteredClasses
+                        .filter((cls: any) => {
+                          // Calculate dayOfWeek and startHour from API data
+                          const classDate = new Date(cls.start);
+                          const classDay = (classDate.getDay() + 6) % 7; // Monday=0
+                          return classDay === dayIndex;
+                        })
+                        .map((cls: any) => {
+                          const startHour = parseInt(
+                            cls.startTime.split(":")[0],
+                            10,
+                          );
+                          const endHour = parseInt(
+                            cls.endTime.split(":")[0],
+                            10,
+                          );
+                          const duration =
+                            endHour -
+                            startHour +
+                            (parseInt(cls.endTime.split(":")[1], 10) -
+                              parseInt(cls.startTime.split(":")[1], 10)) /
+                              60;
+                          const topPosition = (startHour - 7) * HOUR_HEIGHT;
+                          const height = duration * HOUR_HEIGHT;
+                          const groupIdx: number = groups.findIndex(
+                            (g: Group) => g.id === cls.group.id,
+                          );
+                          const color =
+                            groupColors[groupIdx % groupColors.length] ||
+                            "#6366F1";
+                          return (
                             <div
+                              key={cls.id}
                               style={{
-                                fontWeight: "700",
-                                marginBottom: "0.125rem",
+                                position: "absolute",
+                                top: `${topPosition}px`,
+                                left: "4px",
+                                right: "4px",
+                                height: `${height - 8}px`,
+                                backgroundColor: color,
+                                borderRadius: "0.375rem",
+                                padding: "0.5rem",
+                                color: colors.white,
+                                fontSize: "0.75rem",
+                                fontWeight: "600",
+                                overflow: "hidden",
+                                cursor: "pointer",
+                                transition: "all 0.2s",
+                                boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
                               }}
+                              onMouseEnter={(e) => {
+                                e.currentTarget.style.transform = "scale(1.02)";
+                                e.currentTarget.style.boxShadow =
+                                  "0 4px 8px rgba(0, 0, 0, 0.2)";
+                                e.currentTarget.style.zIndex = "10";
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.transform = "scale(1)";
+                                e.currentTarget.style.boxShadow =
+                                  "0 2px 4px rgba(0, 0, 0, 0.1)";
+                                e.currentTarget.style.zIndex = "1";
+                              }}
+                              onClick={() => handleClassInfo(cls)}
                             >
-                              {cls.name}
+                              <div
+                                style={{
+                                  fontWeight: "700",
+                                  marginBottom: "0.125rem",
+                                }}
+                              >
+                                {cls.name}
+                              </div>
+                              <div
+                                style={{ fontSize: "0.625rem", opacity: 0.9 }}
+                              >
+                                {cls.startTime} - {cls.endTime}
+                              </div>
                             </div>
-                            <div style={{ fontSize: "0.625rem", opacity: 0.9 }}>
-                              {formatTime(cls.startHour)} -{" "}
-                              {formatTime(cls.startHour + cls.duration)}
-                            </div>
-                          </div>
-                        );
-                      })}
+                          );
+                        })
+                    )}
+                    if (groupsLoading || classesLoading) return{" "}
+                    <div>Loading...</div>; if (groupsError) return{" "}
+                    <div>Error loading groups</div>; if (classesError) return{" "}
+                    <div>Error loading classes</div>;
                   </div>
                 </div>
               ))}
