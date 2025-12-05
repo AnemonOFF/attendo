@@ -312,6 +312,7 @@ const ClassAttendanceScreen: React.FC = () => {
         >
           <button
             onClick={handleBackButton}
+            aria-label="Go back"
             style={{
               display: "flex",
               alignItems: "center",
@@ -495,6 +496,7 @@ const ClassAttendanceScreen: React.FC = () => {
           >
             <button
               onClick={() => navigateWeek("prev")}
+              aria-label="Previous week view"
               style={{
                 display: "flex",
                 alignItems: "center",
@@ -530,6 +532,7 @@ const ClassAttendanceScreen: React.FC = () => {
 
             <button
               onClick={() => navigateWeek("next")}
+              aria-label="Next week view"
               style={{
                 display: "flex",
                 alignItems: "center",

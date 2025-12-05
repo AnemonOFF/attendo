@@ -1,12 +1,45 @@
 /* eslint-disable sonarjs/no-duplicate-string */
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { vi } from "vitest";
 
 import ClassAttendanceScreen from "./ClassAttendanceScreen";
 
+const mockGroups = [
+  { id: 1, name: "Beginner Flow", color: "#E5E7EB" },
+  { id: 2, name: "Power Lunch", color: "#FDE68A" },
+  { id: 3, name: "Advanced Yoga", color: "#A7F3D0" },
+];
+
+const mockStudents = [
+  { id: 1, name: "Alice Johnson", groupId: 1 },
+  { id: 2, name: "Bob Smith", groupId: 1 },
+  { id: 3, name: "Carla Gomez", groupId: 1 },
+  { id: 4, name: "David Lee", groupId: 1 },
+  { id: 5, name: "Eva Brown", groupId: 1 },
+  { id: 6, name: "Ian Malcolm", groupId: 3 },
+];
+
+const apiMocks = vi.hoisted(() => ({
+  getGroups: vi.fn(),
+  getStudentsByGroup: vi.fn(),
+  updateAttendance: vi.fn(),
+}));
+
+vi.mock("../api/groupController", () => ({
+  getGroups: apiMocks.getGroups,
+}));
+
+vi.mock("../api/studentController", () => ({
+  getStudentsByGroup: apiMocks.getStudentsByGroup,
+}));
+
+vi.mock("../api/attendanceController", () => ({
+  updateAttendance: apiMocks.updateAttendance,
+}));
+
 const mockNavigate = vi.fn();
-const mockLocationState = { name: "Morning Yoga" };
+const mockLocationState = { id: 101, name: "Morning Yoga" };
 
 vi.mock("react-router-dom", async () => {
   const actual =
@@ -29,25 +62,46 @@ vi.mock("react-router-dom", async () => {
 describe("ClassAttendanceScreen", () => {
   beforeEach(() => {
     mockNavigate.mockReset();
+    apiMocks.getGroups.mockReset();
+    apiMocks.getStudentsByGroup.mockReset();
+    apiMocks.updateAttendance.mockReset();
+
+    apiMocks.getGroups.mockResolvedValue({
+      data: { items: mockGroups },
+    });
+
+    apiMocks.getStudentsByGroup.mockImplementation(
+      (groupId: number | undefined) => {
+        const students = mockStudents.filter(
+          (student) => student.groupId === groupId,
+        );
+        return Promise.resolve({ data: students });
+      },
+    );
+
+    apiMocks.updateAttendance.mockResolvedValue({});
   });
 
   it("renders class name from navigation state and filters students", async () => {
     const user = userEvent.setup();
     render(<ClassAttendanceScreen />);
 
-    expect(screen.getByText("Morning Yoga")).toBeInTheDocument();
+    expect(await screen.findByText("Morning Yoga")).toBeInTheDocument();
 
-    await user.selectOptions(screen.getByRole("combobox"), "3");
+    const groupSelect = await screen.findByRole("combobox");
+    await user.selectOptions(groupSelect, "3");
 
-    expect(screen.getByText("Ian Malcolm")).toBeInTheDocument();
-    expect(screen.queryByText("Alice Johnson")).not.toBeInTheDocument();
+    expect(await screen.findByText("Ian Malcolm")).toBeInTheDocument();
+    await waitFor(() =>
+      expect(screen.queryByText("Alice Johnson")).not.toBeInTheDocument(),
+    );
   });
 
   it("allows toggling attendance for individual students", async () => {
     const user = userEvent.setup();
     render(<ClassAttendanceScreen />);
 
-    const firstCheckbox = screen.getAllByRole("checkbox")[0];
+    const firstCheckbox = (await screen.findAllByRole("checkbox"))[0];
     expect(firstCheckbox).not.toBeChecked();
 
     await user.click(firstCheckbox);
@@ -61,7 +115,7 @@ describe("ClassAttendanceScreen", () => {
     const user = userEvent.setup();
     render(<ClassAttendanceScreen />);
 
-    const dayHeaders = screen.getAllByRole("columnheader");
+    const dayHeaders = await screen.findAllByRole("columnheader");
     const firstDayHeader = dayHeaders[1]; // index 0 is "Student Name"
 
     await user.click(firstDayHeader);
@@ -99,11 +153,11 @@ describe("ClassAttendanceScreen", () => {
 
     render(<ClassAttendanceScreen />);
 
-    await user.click(
-      screen.getByRole("button", {
-        name: /export csv/i,
-      }),
-    );
+    const exportButton = await screen.findByRole("button", {
+      name: /export csv/i,
+    });
+
+    await user.click(exportButton);
 
     expect(createObjectURLSpy).toHaveBeenCalled();
     expect(appendSpy).toHaveBeenCalledWith(anchor);
@@ -121,7 +175,7 @@ describe("ClassAttendanceScreen", () => {
     const user = userEvent.setup();
     render(<ClassAttendanceScreen />);
 
-    await user.click(screen.getByLabelText(/go back/i));
+    await user.click(await screen.findByLabelText(/go back/i));
     expect(mockNavigate).toHaveBeenCalledWith(-1);
   });
 
@@ -129,6 +183,7 @@ describe("ClassAttendanceScreen", () => {
     const user = userEvent.setup();
     render(<ClassAttendanceScreen />);
 
+    await screen.findAllByRole("columnheader");
     const getFirstHeader = () =>
       screen.getAllByRole("columnheader")[1].textContent;
 
