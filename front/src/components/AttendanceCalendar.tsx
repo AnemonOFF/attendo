@@ -1,6 +1,18 @@
+/* eslint-disable sonarjs/no-duplicate-string */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // API Types
-import { useGroups } from "../hooks/useGroups";
+import {
+  ChevronLeft,
+  ChevronRight,
+  Plus,
+  ChevronDown,
+  Pencil,
+} from "lucide-react";
+import React, { useState, useMemo, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
+
 import { useClasses } from "../hooks/useClasses";
+import { useGroups } from "../hooks/useGroups";
 
 interface Group {
   id: number;
@@ -20,7 +32,18 @@ interface Class {
 }
 
 // Color palette for groups
-const groupColors = ["#10B981", "#3B82F6", "#F59E0B", "#EF4444", "#8B5CF6", "#6366F1", "#F472B6", "#F87171", "#34D399", "#60A5FA"];
+const groupColors = [
+  "#10B981",
+  "#3B82F6",
+  "#F59E0B",
+  "#EF4444",
+  "#8B5CF6",
+  "#6366F1",
+  "#F472B6",
+  "#F87171",
+  "#34D399",
+  "#60A5FA",
+];
 
 // GroupDropdown using API data
 const GroupDropdown = ({
@@ -38,7 +61,8 @@ const GroupDropdown = ({
   const ref = useRef<HTMLDivElement | null>(null);
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (ref.current && !ref.current.contains(event.target as Node)) setOpen(false);
+      if (ref.current && !ref.current.contains(event.target as Node))
+        setOpen(false);
     };
     if (open) document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
@@ -66,137 +90,6 @@ const GroupDropdown = ({
         onClick={() => setOpen((curr) => !curr)}
       >
         <span>{selectedGroup?.title || ""}</span>
-        <ChevronDown size={18} style={{ transform: open ? "rotate(180deg)" : "" }} />
-      </button>
-      {open && (
-        <div
-          style={{
-            position: "absolute",
-            top: "110%",
-            left: 0,
-            width: "100%",
-            background: "#FFF",
-            border: "1px solid #E5E7EB",
-            borderRadius: "0.5rem",
-            boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
-            zIndex: 10,
-            marginTop: 4,
-          }}
-        >
-          <div
-            style={{
-              padding: "0.5rem 1rem",
-              cursor: "pointer",
-              color: "#111827",
-              borderRadius: "0.5rem 0.5rem 0 0",
-              borderBottom: "1px solid #F1F1F1",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-            }}
-            onClick={() => {
-              setSelectedGroupId("all");
-              setOpen(false);
-            }}
-          >
-            All Groups
-          </div>
-          {groups.length === 0 ? (
-            <div style={{ padding: "0.5rem 1rem", color: "#888" }}>No groups found</div>
-          ) : (
-            groups.map((group, i) => (
-              <div
-                key={group.id}
-                style={{
-                  padding: "0.5rem 1rem",
-                  cursor: "pointer",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  backgroundColor: selectedGroupId === group.id.toString() ? "#EEF2FF" : "#FFF",
-                  borderBottom: i === groups.length - 1 ? "none" : "1px solid #F1F1F1",
-                }}
-                onClick={() => {
-                  setSelectedGroupId(group.id.toString());
-                  setOpen(false);
-                }}
-              >
-                <span style={{ color: "black", textAlign: "left" }}>{group.title}</span>
-                <Pencil
-                  size={16}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setOpen(false);
-                    onEditGroup(group);
-                  }}
-                  style={{
-                    color: "#6366F1",
-                    marginLeft: 10,
-                    cursor: "pointer",
-                    verticalAlign: "middle",
-                  }}
-                />
-              </div>
-            ))
-          )}
-        </div>
-      )}
-    </div>
-  );
-};
-/* eslint-disable sonarjs/no-duplicate-string */
-import {
-  ChevronLeft,
-  ChevronRight,
-  Plus,
-  ChevronDown,
-  Pencil,
-} from "lucide-react";
-import React, { useState, useMemo, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
-
-const GroupDropdown = ({
-  selectedGroupId,
-  setSelectedGroupId,
-  onEditGroup,
-}: {
-  selectedGroupId: string;
-  setSelectedGroupId: (id: string) => void;
-  onEditGroup: (group: Group) => void;
-}) => {
-  const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLDivElement | null>(null);
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (ref.current && !ref.current.contains(event.target as Node))
-        setOpen(false);
-    };
-    if (open) document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [open]);
-  const selectedGroup =
-    selectedGroupId === "all"
-      ? { id: "all", name: "All Groups" }
-      : mockGroups.find((g) => g.id === selectedGroupId);
-  return (
-    <div ref={ref} style={{ position: "relative", minWidth: 160 }}>
-      <button
-        style={{
-          width: "100%",
-          padding: "0.625rem 1rem",
-          borderRadius: "0.5rem",
-          border: "1px solid #E5E7EB",
-          fontSize: "0.875rem",
-          color: "#111827",
-          background: "#FFF",
-          cursor: "pointer",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-        }}
-        onClick={() => setOpen((curr) => !curr)}
-      >
-        <span>{selectedGroup?.name || ""}</span>
         <ChevronDown
           size={18}
           style={{ transform: open ? "rotate(180deg)" : "" }}
@@ -235,50 +128,182 @@ const GroupDropdown = ({
           >
             All Groups
           </div>
-          {mockGroups.map((group, i) => (
-            <div
-              key={group.id}
-              style={{
-                padding: "0.5rem 1rem",
-                cursor: "pointer",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                backgroundColor:
-                  selectedGroupId === group.id ? "#EEF2FF" : "#FFF",
-                borderBottom:
-                  i === mockGroups.length - 1 ? "none" : "1px solid #F1F1F1",
-              }}
-              onClick={() => {
-                setSelectedGroupId(group.id);
-                setOpen(false);
-              }}
-            >
-              <span style={{ color: "black", textAlign: "left" }}>
-                {group.name}
-              </span>
-              <Pencil
-                size={16}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setOpen(false);
-                  onEditGroup(group);
-                }}
-                style={{
-                  color: "#6366F1",
-                  marginLeft: 10,
-                  cursor: "pointer",
-                  verticalAlign: "middle",
-                }}
-                //title="Edit Group"
-              />
+          {groups.length === 0 ? (
+            <div style={{ padding: "0.5rem 1rem", color: "#888" }}>
+              No groups found
             </div>
-          ))}
+          ) : (
+            groups.map((group, i) => (
+              <div
+                key={group.id}
+                style={{
+                  padding: "0.5rem 1rem",
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  backgroundColor:
+                    selectedGroupId === group.id.toString()
+                      ? "#EEF2FF"
+                      : "#FFF",
+                  borderBottom:
+                    i === groups.length - 1 ? "none" : "1px solid #F1F1F1",
+                }}
+                onClick={() => {
+                  setSelectedGroupId(group.id.toString());
+                  setOpen(false);
+                }}
+              >
+                <span style={{ color: "black", textAlign: "left" }}>
+                  {group.title}
+                </span>
+                <Pencil
+                  size={16}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setOpen(false);
+                    onEditGroup(group);
+                  }}
+                  style={{
+                    color: "#6366F1",
+                    marginLeft: 10,
+                    cursor: "pointer",
+                    verticalAlign: "middle",
+                  }}
+                />
+              </div>
+            ))
+          )}
         </div>
       )}
     </div>
   );
 };
+
+// const GroupDropdown = ({
+//   selectedGroupId,
+//   setSelectedGroupId,
+//   onEditGroup,
+// }: {
+//   selectedGroupId: string;
+//   setSelectedGroupId: (id: string) => void;
+//   onEditGroup: (group: Group) => void;
+// }) => {
+//   const [open, setOpen] = useState(false);
+//   const ref = useRef<HTMLDivElement | null>(null);
+//   useEffect(() => {
+//     const handleClickOutside = (event: MouseEvent) => {
+//       if (ref.current && !ref.current.contains(event.target as Node))
+//         setOpen(false);
+//     };
+//     if (open) document.addEventListener("mousedown", handleClickOutside);
+//     return () => document.removeEventListener("mousedown", handleClickOutside);
+//   }, [open]);
+//   const selectedGroup =
+//     selectedGroupId === "all"
+//       ? { id: "all", name: "All Groups" }
+//       : mockGroups.find((g) => g.id === selectedGroupId);
+//   return (
+//     <div ref={ref} style={{ position: "relative", minWidth: 160 }}>
+//       <button
+//         style={{
+//           width: "100%",
+//           padding: "0.625rem 1rem",
+//           borderRadius: "0.5rem",
+//           border: "1px solid #E5E7EB",
+//           fontSize: "0.875rem",
+//           color: "#111827",
+//           background: "#FFF",
+//           cursor: "pointer",
+//           display: "flex",
+//           alignItems: "center",
+//           justifyContent: "space-between",
+//         }}
+//         onClick={() => setOpen((curr) => !curr)}
+//       >
+//         <span>{selectedGroup?.name || ""}</span>
+//         <ChevronDown
+//           size={18}
+//           style={{ transform: open ? "rotate(180deg)" : "" }}
+//         />
+//       </button>
+//       {open && (
+//         <div
+//           style={{
+//             position: "absolute",
+//             top: "110%",
+//             left: 0,
+//             width: "100%",
+//             background: "#FFF",
+//             border: "1px solid #E5E7EB",
+//             borderRadius: "0.5rem",
+//             boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+//             zIndex: 10,
+//             marginTop: 4,
+//           }}
+//         >
+//           <div
+//             style={{
+//               padding: "0.5rem 1rem",
+//               cursor: "pointer",
+//               color: "#111827",
+//               borderRadius: "0.5rem 0.5rem 0 0",
+//               borderBottom: "1px solid #F1F1F1",
+//               display: "flex",
+//               alignItems: "center",
+//               justifyContent: "space-between",
+//             }}
+//             onClick={() => {
+//               setSelectedGroupId("all");
+//               setOpen(false);
+//             }}
+//           >
+//             All Groups
+//           </div>
+//           {mockGroups.map((group, i) => (
+//             <div
+//               key={group.id}
+//               style={{
+//                 padding: "0.5rem 1rem",
+//                 cursor: "pointer",
+//                 display: "flex",
+//                 alignItems: "center",
+//                 justifyContent: "space-between",
+//                 backgroundColor:
+//                   selectedGroupId === group.id ? "#EEF2FF" : "#FFF",
+//                 borderBottom:
+//                   i === mockGroups.length - 1 ? "none" : "1px solid #F1F1F1",
+//               }}
+//               onClick={() => {
+//                 setSelectedGroupId(group.id);
+//                 setOpen(false);
+//               }}
+//             >
+//               <span style={{ color: "black", textAlign: "left" }}>
+//                 {group.name}
+//               </span>
+//               <Pencil
+//                 size={16}
+//                 onClick={(e) => {
+//                   e.stopPropagation();
+//                   setOpen(false);
+//                   onEditGroup(group);
+//                 }}
+//                 style={{
+//                   color: "#6366F1",
+//                   marginLeft: 10,
+//                   cursor: "pointer",
+//                   verticalAlign: "middle",
+//                 }}
+//                 //title="Edit Group"
+//               />
+//             </div>
+//           ))}
+//         </div>
+//       )}
+//     </div>
+//   );
+// };
 
 const AttendanceCalendar: React.FC = () => {
   // State Management
@@ -293,7 +318,7 @@ const AttendanceCalendar: React.FC = () => {
   });
   const [selectedGroupId, setSelectedGroupId] = useState<string>("all");
   // Fetch groups
-  const { data: groups = [], isLoading: groupsLoading, error: groupsError } = useGroups();
+  const { data: groups = [] } = useGroups();
 
   // Calculate week range for API
   const weekStart = new Date(currentWeekStart);
@@ -303,12 +328,14 @@ const AttendanceCalendar: React.FC = () => {
   const to = weekEnd.toISOString().split("T")[0] + "T23:59:59Z";
 
   // Fetch classes
-  const { data: classes = [], isLoading: classesLoading, error: classesError } = useClasses(from, to);
+  const { data: classes = [] } = useClasses(from, to);
 
   // Filter classes by selected group
   const filteredClasses = useMemo(() => {
     if (selectedGroupId === "all") return classes;
-    return classes.filter((cls: any) => cls.group.id.toString() === selectedGroupId);
+    return classes.filter(
+      (cls: any) => cls.group.id.toString() === selectedGroupId,
+    );
   }, [selectedGroupId, classes]);
   const navigate = useNavigate();
 
@@ -368,8 +395,6 @@ const AttendanceCalendar: React.FC = () => {
     console.warn("Navigate to Class Info screen");
     navigate("/classInfo", { state: classInfo });
   };
-
-
 
   // Format time display
   const formatTime = (hour: number): string => {
@@ -660,10 +685,17 @@ const AttendanceCalendar: React.FC = () => {
                         }}
                       />
                     ))}
-
                     {/* Classes for this day */}
                     {filteredClasses.length === 0 ? (
-                      <div style={{ padding: "0.5rem", color: "#888", textAlign: "center" }}>No classes found</div>
+                      <div
+                        style={{
+                          padding: "0.5rem",
+                          color: "#888",
+                          textAlign: "center",
+                        }}
+                      >
+                        No classes found
+                      </div>
                     ) : (
                       filteredClasses
                         .filter((cls: any) => {
@@ -673,15 +705,28 @@ const AttendanceCalendar: React.FC = () => {
                           return classDay === dayIndex;
                         })
                         .map((cls: any) => {
-                          const classDate = new Date(cls.start);
-                          const classDay = (classDate.getDay() + 6) % 7;
-                          const startHour = parseInt(cls.startTime.split(":")[0], 10);
-                          const endHour = parseInt(cls.endTime.split(":")[0], 10);
-                          const duration = endHour - startHour + (parseInt(cls.endTime.split(":")[1], 10) - parseInt(cls.startTime.split(":")[1], 10)) / 60;
+                          const startHour = parseInt(
+                            cls.startTime.split(":")[0],
+                            10,
+                          );
+                          const endHour = parseInt(
+                            cls.endTime.split(":")[0],
+                            10,
+                          );
+                          const duration =
+                            endHour -
+                            startHour +
+                            (parseInt(cls.endTime.split(":")[1], 10) -
+                              parseInt(cls.startTime.split(":")[1], 10)) /
+                              60;
                           const topPosition = (startHour - 7) * HOUR_HEIGHT;
                           const height = duration * HOUR_HEIGHT;
-                            const groupIdx: number = groups.findIndex((g: Group) => g.id === cls.group.id);
-                          const color = groupColors[groupIdx % groupColors.length] || "#6366F1";
+                          const groupIdx: number = groups.findIndex(
+                            (g: Group) => g.id === cls.group.id,
+                          );
+                          const color =
+                            groupColors[groupIdx % groupColors.length] ||
+                            "#6366F1";
                           return (
                             <div
                               key={cls.id}
@@ -704,27 +749,39 @@ const AttendanceCalendar: React.FC = () => {
                               }}
                               onMouseEnter={(e) => {
                                 e.currentTarget.style.transform = "scale(1.02)";
-                                e.currentTarget.style.boxShadow = "0 4px 8px rgba(0, 0, 0, 0.2)";
+                                e.currentTarget.style.boxShadow =
+                                  "0 4px 8px rgba(0, 0, 0, 0.2)";
                                 e.currentTarget.style.zIndex = "10";
                               }}
                               onMouseLeave={(e) => {
                                 e.currentTarget.style.transform = "scale(1)";
-                                e.currentTarget.style.boxShadow = "0 2px 4px rgba(0, 0, 0, 0.1)";
+                                e.currentTarget.style.boxShadow =
+                                  "0 2px 4px rgba(0, 0, 0, 0.1)";
                                 e.currentTarget.style.zIndex = "1";
                               }}
                               onClick={() => handleClassInfo(cls)}
                             >
-                              <div style={{ fontWeight: "700", marginBottom: "0.125rem" }}>{cls.name}</div>
-                              <div style={{ fontSize: "0.625rem", opacity: 0.9 }}>
+                              <div
+                                style={{
+                                  fontWeight: "700",
+                                  marginBottom: "0.125rem",
+                                }}
+                              >
+                                {cls.name}
+                              </div>
+                              <div
+                                style={{ fontSize: "0.625rem", opacity: 0.9 }}
+                              >
                                 {cls.startTime} - {cls.endTime}
                               </div>
                             </div>
                           );
                         })
                     )}
-                    if (groupsLoading || classesLoading) return <div>Loading...</div>;
-                    if (groupsError) return <div>Error loading groups</div>;
-                    if (classesError) return <div>Error loading classes</div>;
+                    if (groupsLoading || classesLoading) return{" "}
+                    <div>Loading...</div>; if (groupsError) return{" "}
+                    <div>Error loading groups</div>; if (classesError) return{" "}
+                    <div>Error loading classes</div>;
                   </div>
                 </div>
               ))}

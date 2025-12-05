@@ -88,7 +88,7 @@ const Login: React.FC = () => {
 
       // Store remember me preference if needed
       if (formData.rememberMe) {
-        localStorage.setItem('rememberMe', 'true');
+        localStorage.setItem("rememberMe", "true");
       }
 
       // On successful login, navigate to dashboard
