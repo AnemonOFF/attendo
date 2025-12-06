@@ -3,13 +3,14 @@ import { ArrowLeft, Plus, Trash2, X } from "lucide-react";
 import React, { useState, useRef, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 
+import { updateGroup } from "../api/groupController";
+import { createStudent } from "../api/studentController";
+
 // TypeScript Interfaces
 interface Student {
-  id: string;
-  name: string;
-  email: string;
+  id?: string;
+  fullName: string;
   groupId: string;
-  joinDate: string;
 }
 
 interface SwipeState {
@@ -19,60 +20,14 @@ interface SwipeState {
   startX: number;
 }
 
-const mockStudents: Student[] = [
-  {
-    id: "1",
-    name: "Alice Johnson",
-    email: "alice.johnson@email.com",
-    groupId: "1",
-    joinDate: "2024-01-15",
-  },
-  {
-    id: "2",
-    name: "Bob Smith",
-    email: "bob.smith@email.com",
-    groupId: "1",
-    joinDate: "2024-01-20",
-  },
-  {
-    id: "3",
-    name: "Charlie Brown",
-    email: "charlie.brown@email.com",
-    groupId: "1",
-    joinDate: "2024-02-05",
-  },
-  {
-    id: "4",
-    name: "Diana Prince",
-    email: "diana.prince@email.com",
-    groupId: "1",
-    joinDate: "2024-02-12",
-  },
-  {
-    id: "5",
-    name: "Ethan Hunt",
-    email: "ethan.hunt@email.com",
-    groupId: "1",
-    joinDate: "2024-02-18",
-  },
-  {
-    id: "6",
-    name: "Fiona Apple",
-    email: "fiona.apple@email.com",
-    groupId: "1",
-    joinDate: "2024-03-01",
-  },
-];
-
 const EditGroupScreen: React.FC = () => {
   // State Management
-  const [students, setStudents] = useState<Student[]>(mockStudents);
+  const [students, setStudents] = useState<Student[]>([]);
   const [swipeState, setSwipeState] = useState<SwipeState | null>(null);
 
   // Add Student Modal State
   const [showAddModal, setShowAddModal] = useState(false);
   const [newStudentName, setNewStudentName] = useState("");
-  const [newStudentEmail, setNewStudentEmail] = useState("");
 
   // Delete Confirmation State
   const [deleteConfirmation, setDeleteConfirmation] = useState<{
@@ -90,6 +45,10 @@ const EditGroupScreen: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const state = location.state || { name: "Group Name" }; // Fallback if state is missing
+
+  useEffect(() => {
+    setStudents(location.state.students || []);
+  }, [location.state]);
 
   // Theme colors
   const colors = {
@@ -122,20 +81,21 @@ const EditGroupScreen: React.FC = () => {
   const handleCloseAddModal = () => {
     setShowAddModal(false);
     setNewStudentName("");
-    setNewStudentEmail("");
   };
 
-  const handleSaveNewStudent = (e: React.FormEvent) => {
+  const handleSaveNewStudent = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newStudentName.trim() || !newStudentEmail.trim()) return;
+    if (!newStudentName.trim()) return;
 
     const newStudent: Student = {
-      id: Date.now().toString(), // Simple ID generation
-      name: newStudentName,
-      email: newStudentEmail,
+      fullName: newStudentName,
       groupId: state.id || "1",
-      joinDate: new Date().toISOString(),
     };
+
+    const res = await createStudent({ fullName: newStudentName });
+    await updateGroup(Number(state.id), {
+      students: [...students.map((s) => s.id!), res.data.id],
+    });
 
     setStudents([...students, newStudent]);
     handleCloseAddModal();
@@ -253,10 +213,13 @@ const EditGroupScreen: React.FC = () => {
     });
   };
 
-  const handleDeleteStudent = () => {
-    setStudents((prev) =>
-      prev.filter((student) => student.id !== deleteConfirmation.studentId),
-    );
+  const handleDeleteStudent = async () => {
+    await updateGroup(Number(state.id), {
+      students: students
+        .filter((s) => s.id !== deleteConfirmation.studentId)
+        .map((s) => Number(s.id!)),
+    });
+    setStudents(students.filter((s) => s.id !== deleteConfirmation.studentId));
     setDeleteConfirmation({ show: false, studentId: "", studentName: "" });
 
     // Reset any open swipe states
@@ -270,16 +233,6 @@ const EditGroupScreen: React.FC = () => {
 
   const cancelDelete = () => {
     setDeleteConfirmation({ show: false, studentId: "", studentName: "" });
-  };
-
-  // Format date
-  const formatDate = (dateString: string): string => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    });
   };
 
   return (
@@ -521,7 +474,7 @@ const EditGroupScreen: React.FC = () => {
                     >
                       <button
                         onClick={() =>
-                          showDeleteConfirmation(student.id, student.name)
+                          showDeleteConfirmation(student.id!, student.fullName)
                         }
                         style={{
                           background: "none",
@@ -548,7 +501,7 @@ const EditGroupScreen: React.FC = () => {
                     {/* Student Row */}
                     <div
                       ref={(el) => {
-                        swipeRefs.current[student.id] = el;
+                        swipeRefs.current[student.id!] = el;
                       }}
                       style={{
                         padding: "1rem 1.5rem",
@@ -561,10 +514,10 @@ const EditGroupScreen: React.FC = () => {
                         transform: "translateX(0px)",
                         userSelect: "none",
                       }}
-                      onTouchStart={(e) => handleTouchStart(e, student.id)}
+                      onTouchStart={(e) => handleTouchStart(e, student.id!)}
                       onTouchMove={handleTouchMove}
                       onTouchEnd={handleTouchEnd}
-                      onMouseDown={(e) => handleMouseDown(e, student.id)}
+                      onMouseDown={(e) => handleMouseDown(e, student.id!)}
                     >
                       <div
                         style={{
@@ -582,26 +535,8 @@ const EditGroupScreen: React.FC = () => {
                               margin: "0 0 0.25rem 0",
                             }}
                           >
-                            {student.name}
+                            {student.fullName}
                           </h3>
-                          <p
-                            style={{
-                              fontSize: "0.875rem",
-                              color: colors.text.secondary,
-                              margin: "0 0 0.25rem 0",
-                            }}
-                          >
-                            {student.email}
-                          </p>
-                          <p
-                            style={{
-                              fontSize: "0.75rem",
-                              color: colors.text.light,
-                              margin: 0,
-                            }}
-                          >
-                            Joined {formatDate(student.joinDate)}
-                          </p>
                         </div>
                       </div>
                     </div>
@@ -716,47 +651,6 @@ const EditGroupScreen: React.FC = () => {
                   />
                 </div>
 
-                <div style={{ marginBottom: "2rem" }}>
-                  <label
-                    style={{
-                      display: "block",
-                      fontSize: "0.875rem",
-                      fontWeight: "500",
-                      color: colors.text.secondary,
-                      marginBottom: "0.5rem",
-                    }}
-                  >
-                    Email Address
-                  </label>
-                  <input
-                    type="email"
-                    value={newStudentEmail}
-                    onChange={(e) => setNewStudentEmail(e.target.value)}
-                    placeholder="e.g. jane@example.com"
-                    style={{
-                      width: "100%",
-                      padding: "0.75rem",
-                      borderRadius: "0.5rem",
-                      border: `1px solid ${colors.border}`,
-                      fontSize: "0.875rem",
-                      outline: "none",
-                      boxSizing: "border-box",
-                      backgroundColor: colors.background,
-                      color: colors.text.primary,
-                    }}
-                    onFocus={(e) => {
-                      e.target.style.borderColor = colors.primary;
-                      e.target.style.boxShadow = `0 0 0 3px ${colors.primary}40`;
-                    }}
-                    onBlur={(e) => {
-                      e.target.style.borderColor = state.validationError
-                        ? colors.danger
-                        : "#E5E7EB";
-                      e.target.style.boxShadow = "none";
-                    }}
-                  />
-                </div>
-
                 <div
                   style={{
                     display: "flex",
@@ -800,7 +694,7 @@ const EditGroupScreen: React.FC = () => {
                       fontWeight: "500",
                       cursor: "pointer",
                       transition: "all 0.2s",
-                      opacity: !newStudentName || !newStudentEmail ? 0.6 : 1,
+                      opacity: !newStudentName ? 0.6 : 1,
                     }}
                     onMouseEnter={(e) =>
                       (e.currentTarget.style.backgroundColor =
@@ -809,7 +703,7 @@ const EditGroupScreen: React.FC = () => {
                     onMouseLeave={(e) =>
                       (e.currentTarget.style.backgroundColor = colors.primary)
                     }
-                    disabled={!newStudentName || !newStudentEmail}
+                    disabled={!newStudentName}
                   >
                     Add Student
                   </button>

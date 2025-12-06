@@ -4,21 +4,20 @@ import { ArrowLeft, ChevronLeft, ChevronRight, Download } from "lucide-react";
 import React, { useState, useMemo, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 
-import { updateAttendance } from "../api/attendanceController";
+import { getAttendance, updateAttendance } from "../api/attendanceController";
 import { getGroups } from "../api/groupController";
-import { getStudentsByGroup } from "../api/studentController";
 
 // TypeScript Interfaces
 interface Group {
   id: number;
-  name: string;
+  title: string;
   color: string;
+  students: Student[];
 }
 
 interface Student {
   id: number;
-  name: string;
-  groupId: number;
+  fullName: string;
 }
 
 interface AttendanceRecord {
@@ -44,11 +43,27 @@ const ClassAttendanceScreen: React.FC = () => {
     setConfirmError(null);
     setConfirmSuccess(null);
     try {
-      // Only send present student IDs for the week
-      const presentStudentIds = attendanceRecords
-        .filter((r: AttendanceRecord) => r.present)
-        .map((r: AttendanceRecord) => r.studentId);
-      await updateAttendance(state.id, presentStudentIds);
+      const attendance = attendanceRecords
+        .filter((r) => r.present)
+        .reduce(
+          (acc, r) => {
+            const date = new Date(r.date);
+            date.setHours(0, 0, 0, 0);
+            if (!acc[date.toISOString()]) {
+              acc[date.toISOString()] = [];
+            }
+            acc[date.toISOString()].push(r.studentId);
+            return acc;
+          },
+          {} as Record<string, number[]>,
+        );
+      await updateAttendance(
+        state.id,
+        Object.entries(attendance).map(([date, students]) => ({
+          date: date.split("T")[0],
+          students,
+        })),
+      );
       setConfirmSuccess("Attendance submitted successfully!");
     } catch {
       setConfirmError("Failed to submit attendance.");
@@ -152,7 +167,6 @@ const ClassAttendanceScreen: React.FC = () => {
   // Students state
   const [students, setStudents] = useState<Student[]>([]);
   const [studentsLoading, setStudentsLoading] = useState<boolean>(false);
-  const [studentsError, setStudentsError] = useState<string | null>(null);
 
   // Fetch students when group changes
   useEffect(() => {
@@ -161,14 +175,27 @@ const ClassAttendanceScreen: React.FC = () => {
       return;
     }
     setStudentsLoading(true);
-    getStudentsByGroup(selectedGroupId)
+    const group = groups.find((g) => g.id === selectedGroupId);
+    setStudents(group?.students || []);
+    getAttendance(state.id)
       .then((res) => {
-        setStudents(res.data.items || res.data);
-        setStudentsError(null);
+        setAttendanceRecords(
+          res.data.attendance.flatMap((att) =>
+            att.students.map((studentId) => ({
+              date: att.date,
+              studentId,
+              present: true,
+            })),
+          ),
+        );
       })
-      .catch(() => setStudentsError("Failed to load students"))
-      .finally(() => setStudentsLoading(false));
-  }, [selectedGroupId]);
+      .catch(() => {
+        setAttendanceRecords([]);
+      })
+      .finally(() => {
+        setStudentsLoading(false);
+      });
+  }, [selectedGroupId, groups, state.id]);
 
   const filteredStudents = students;
 
@@ -269,7 +296,7 @@ const ClassAttendanceScreen: React.FC = () => {
     csvContent += "\n";
 
     filteredStudents.forEach((student) => {
-      csvContent += student.name;
+      csvContent += student.fullName;
       monthDates.forEach((date) => {
         const present = isPresent(student.id, date);
         csvContent += `,${present ? "Present" : "Absent"}`;
@@ -397,7 +424,7 @@ const ClassAttendanceScreen: React.FC = () => {
               >
                 {groups.map((group) => (
                   <option key={group.id} value={group.id}>
-                    {group.name}
+                    {group.title}
                   </option>
                 ))}
               </select>
@@ -639,12 +666,6 @@ const ClassAttendanceScreen: React.FC = () => {
                   <tr>
                     <td colSpan={weekDates.length + 1}>Loading students...</td>
                   </tr>
-                ) : studentsError ? (
-                  <tr>
-                    <td colSpan={weekDates.length + 1} style={{ color: "red" }}>
-                      {studentsError}
-                    </td>
-                  </tr>
                 ) : filteredStudents.length === 0 ? (
                   <tr>
                     <td colSpan={weekDates.length + 1}>
@@ -670,7 +691,7 @@ const ClassAttendanceScreen: React.FC = () => {
                               : 0,
                         }}
                       >
-                        {student.name}
+                        {student.fullName}
                       </td>
 
                       {/* Attendance Checkboxes */}
@@ -745,7 +766,7 @@ const ClassAttendanceScreen: React.FC = () => {
               }}
             >
               <strong>{filteredStudents.length}</strong> students in{" "}
-              {groups.find((g) => g.id === selectedGroupId)?.name}
+              {groups.find((g) => g.id === selectedGroupId)?.title}
             </div>
             <div
               style={{
