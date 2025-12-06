@@ -182,14 +182,37 @@ const AddClassScreen: React.FC = () => {
       end.setFullYear(end.getFullYear() + 1);
       const endDate = end.toISOString().split("T")[0];
 
+      // Calculate endTime given startTime (hh:mm), duration, and durationUnit
+      const [startHour, startMinute] = formData.startTime
+        .split(":")
+        .map(Number);
+      const duration = formData.duration;
+      let endHour = startHour;
+      let endMinute = startMinute;
+      if (formData.durationUnit === "hours") {
+        endHour += duration;
+      } else if (formData.durationUnit === "minutes") {
+        endMinute += duration;
+      }
+      // Handle overflow of minutes into hours
+      if (endMinute >= 60) {
+        endHour += Math.floor(endMinute / 60);
+        endMinute = endMinute % 60;
+      }
+      // Format back to hh:mm, keeping leading zeros
+      const endTime =
+        String(endHour).padStart(2, "0") +
+        ":" +
+        String(endMinute).padStart(2, "0");
+
       // API expects: name, groupId, start, end, frequency, startTime, endTime
       await createClass({
         groupId: group.id,
         start: startDate,
         end: endDate,
         startTime: formData.startTime,
-        endTime: "23:59:59",
-        frequency: "daily",
+        endTime: endTime,
+        frequency: formData.selectedDays.join(";"),
         name: formData.className,
       });
 
