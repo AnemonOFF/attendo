@@ -6,23 +6,30 @@ import { vi } from "vitest";
 import ClassAttendanceScreen from "./ClassAttendanceScreen";
 
 const mockGroups = [
-  { id: 1, name: "Beginner Flow", color: "#E5E7EB" },
-  { id: 2, name: "Power Lunch", color: "#FDE68A" },
-  { id: 3, name: "Advanced Yoga", color: "#A7F3D0" },
-];
-
-const mockStudents = [
-  { id: 1, name: "Alice Johnson", groupId: 1 },
-  { id: 2, name: "Bob Smith", groupId: 1 },
-  { id: 3, name: "Carla Gomez", groupId: 1 },
-  { id: 4, name: "David Lee", groupId: 1 },
-  { id: 5, name: "Eva Brown", groupId: 1 },
-  { id: 6, name: "Ian Malcolm", groupId: 3 },
+  {
+    id: 1,
+    title: "Beginner Flow",
+    color: "#E5E7EB",
+    students: [
+      { id: 1, fullName: "Alice Johnson" },
+      { id: 2, fullName: "Bob Smith" },
+      { id: 3, fullName: "Carla Gomez" },
+      { id: 4, fullName: "David Lee" },
+      { id: 5, fullName: "Eva Brown" },
+    ],
+  },
+  { id: 2, title: "Power Lunch", color: "#FDE68A", students: [] },
+  {
+    id: 3,
+    title: "Advanced Yoga",
+    color: "#A7F3D0",
+    students: [{ id: 6, fullName: "Ian Malcolm" }],
+  },
 ];
 
 const apiMocks = vi.hoisted(() => ({
   getGroups: vi.fn(),
-  getStudentsByGroup: vi.fn(),
+  getAttendance: vi.fn(),
   updateAttendance: vi.fn(),
 }));
 
@@ -30,11 +37,8 @@ vi.mock("../api/groupController", () => ({
   getGroups: apiMocks.getGroups,
 }));
 
-vi.mock("../api/studentController", () => ({
-  getStudentsByGroup: apiMocks.getStudentsByGroup,
-}));
-
 vi.mock("../api/attendanceController", () => ({
+  getAttendance: apiMocks.getAttendance,
   updateAttendance: apiMocks.updateAttendance,
 }));
 
@@ -63,22 +67,16 @@ describe("ClassAttendanceScreen", () => {
   beforeEach(() => {
     mockNavigate.mockReset();
     apiMocks.getGroups.mockReset();
-    apiMocks.getStudentsByGroup.mockReset();
+    apiMocks.getAttendance.mockReset();
     apiMocks.updateAttendance.mockReset();
 
     apiMocks.getGroups.mockResolvedValue({
       data: { items: mockGroups },
     });
 
-    apiMocks.getStudentsByGroup.mockImplementation(
-      (groupId: number | undefined) => {
-        const students = mockStudents.filter(
-          (student) => student.groupId === groupId,
-        );
-        return Promise.resolve({ data: students });
-      },
-    );
-
+    apiMocks.getAttendance.mockResolvedValue({
+      data: { attendance: [] },
+    });
     apiMocks.updateAttendance.mockResolvedValue({});
   });
 
